@@ -22,7 +22,12 @@ The separate Nerfstudio environment follows its v1.1.5 CUDA 11.8 installation
 path. Project pins additionally constrain NumPy to 1.26.4 for PyTorch 2.1.2
 and Setuptools to 80.9.0 because the pinned `tiny-cuda-nn` setup imports
 `pkg_resources`, removed from Setuptools 82. `tiny-cuda-nn` is built from an
-exact commit without build isolation, targeting only compute capability 8.9.
+exact cached checkout without build isolation, targeting only compute
+capability 8.9. The pinned commit is from the `tiny-cuda-nn` 1.7 development
+line contemporary with Nerfstudio v1.1.5, avoiding an accidental dependency on
+the newer 2.x API. The Conda CUDA driver stub directory is added to
+`LIBRARY_PATH` for the link step only; it is deliberately excluded from
+`LD_LIBRARY_PATH` so runtime loads the host driver's `libcuda.so.1`.
 
 ## Dataset contract
 

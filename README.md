@@ -231,7 +231,13 @@ Setuptools 80.9.0, and the exact `tiny-cuda-nn` source commit. The Setuptools
 pin is required because `tiny-cuda-nn` imports the legacy `pkg_resources`
 module, which was removed in Setuptools 82. Its CUDA extension is built without
 an isolated temporary environment, for compute capability 8.9 and with two
-parallel compiler jobs. No package needs to be installed manually.
+parallel compiler jobs. The pinned checkout and intermediate build files live
+under `.cache/tiny-cuda-nn`, allowing failed or repeated builds to reuse local
+state. The selected 1.7-era commit matches the period of the Nerfstudio v1.1.5
+release rather than current `tiny-cuda-nn` 2.x. During linking only, the script
+exposes Conda CUDA's `libcuda.so` stub; runtime continues to use the real NVIDIA
+driver. A commit-specific marker avoids rebuilding an already verified local
+extension. No package needs to be installed manually.
 
 Verify both environments after installation with:
 

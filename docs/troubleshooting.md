@@ -55,6 +55,20 @@ verifies the import, and builds the exact `tiny-cuda-nn` commit with
 `--no-build-isolation`. `ns-train: No such file or directory` after this error
 only means setup stopped before Nerfstudio itself was installed.
 
+## `tiny-cuda-nn` linker cannot find `-lcuda`
+
+The CUDA runtime wheels and the host driver normally provide `libcuda.so.1`,
+while extension linking requires the unversioned `libcuda.so` name. Conda's
+`cuda-driver-dev` package supplies a safe link stub under
+`targets/x86_64-linux/lib/stubs`. The setup script discovers that file and
+adds its directory to `LIBRARY_PATH` only for the `tiny-cuda-nn` build.
+
+Do not add the stub directory to `LD_LIBRARY_PATH` and do not create system
+symlinks: either can make runtime load a non-functional stub instead of the
+real NVIDIA driver. Pull the fix and rerun `make setup-splatfacto`; the pinned
+checkout under `.cache/tiny-cuda-nn` preserves intermediate build state for
+subsequent attempts.
+
 ## `envs/base.yml` is missing
 
 ViPE v1.2.0 uses `envs/cu128.yml`; `base.yml` belongs to a different repository
