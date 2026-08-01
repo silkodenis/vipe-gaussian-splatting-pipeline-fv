@@ -4,9 +4,13 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import json
 from pathlib import Path
+from typing import Iterator
 
+import torch
+from nerfstudio.models.splatfacto import SplatfactoModel
 from nerfstudio.scripts.render import RenderCameraPath
 
 
@@ -16,6 +20,48 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--camera-path", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
+
+
+def viewer_background_rgb(payload: dict) -> tuple[int, int, int] | None:
+    """Return the crop background saved by the Viewer, if present."""
+    crop = payload.get("crop")
+    if not isinstance(crop, dict):
+        return None
+    color = crop.get("crop_bg_color")
+    if not isinstance(color, dict):
+        return None
+
+    rgb = tuple(int(color[channel]) for channel in ("r", "g", "b"))
+    if any(channel < 0 or channel > 255 for channel in rgb):
+        raise ValueError(f"Invalid Viewer crop background: {rgb}")
+    return rgb
+
+
+@contextmanager
+def splatfacto_background_override(rgb: tuple[int, int, int] | None) -> Iterator[None]:
+    """Make pinned Splatfacto honor the background stored in Viewer JSON.
+
+    Nerfstudio 1.1.5 applies Viewer crop backgrounds through RGBRenderer's
+    global override. Splatfacto has a separate background implementation and
+    ignores that override, so its built-in gray background otherwise appears
+    in offline renders. Keep this compatibility shim local to this process and
+    restore the upstream method after rendering.
+    """
+    if rgb is None:
+        yield
+        return
+
+    background = torch.tensor(rgb, dtype=torch.float32) / 255.0
+    original_get_background_color = SplatfactoModel._get_background_color
+
+    def get_viewer_background(model: SplatfactoModel) -> torch.Tensor:
+        return background.to(model.device)
+
+    SplatfactoModel._get_background_color = get_viewer_background
+    try:
+        yield
+    finally:
+        SplatfactoModel._get_background_color = original_get_background_color
 
 
 def main() -> int:
@@ -34,12 +80,16 @@ def main() -> int:
 
     print(f"Viewer path: {camera_path}")
     print(f"Viewer crop: {json.dumps(payload.get('crop'), sort_keys=True)}")
+    background_rgb = viewer_background_rgb(payload)
+    if background_rgb is not None:
+        print(f"Splatfacto background: RGB{background_rgb} (from Viewer JSON)")
     print(f"Output: {output}")
-    RenderCameraPath(
-        load_config=load_config,
-        camera_path_filename=camera_path,
-        output_path=output,
-    ).main()
+    with splatfacto_background_override(background_rgb):
+        RenderCameraPath(
+            load_config=load_config,
+            camera_path_filename=camera_path,
+            output_path=output,
+        ).main()
     return 0
 
 

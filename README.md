@@ -433,6 +433,11 @@ Viewer JSON is the source of truth for keyframes, interpolated frames, crop,
 background, FOV, resolution, FPS, and duration. The result is written to
 `renders/zavod70/<timestamp>.mp4`.
 
+The project render wrapper also works around a pinned Nerfstudio 1.1.5 issue
+where Splatfacto ignores the Viewer's background-color override during offline
+rendering. It applies the `crop_bg_color` read from that same timestamped JSON
+to Splatfacto at runtime; it does not rewrite the path file or the checkpoint.
+
 To render a specific older Viewer path instead of the newest one:
 
 ```bash

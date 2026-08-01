@@ -208,3 +208,19 @@ make view-splat-full
 
 Validation rejects partial checkpoints, so a saved step 6,000 model cannot be
 mistaken for the finished step 29,999 result.
+
+# Offline render has the wrong gray background
+
+Nerfstudio 1.1.5's standard camera-path renderer does not propagate the
+Viewer's crop background to Splatfacto, which otherwise renders its built-in
+gray-blue background. Use the project target instead of invoking `ns-render`
+directly:
+
+```bash
+make render-splat-full
+```
+
+The wrapper reads `crop_bg_color` from the newest timestamped Viewer JSON and
+applies it to Splatfacto for that render only. Existing camera paths do not
+need to be regenerated. The log must include, for example,
+`Splatfacto background: RGB(8, 8, 8) (from Viewer JSON)`.
