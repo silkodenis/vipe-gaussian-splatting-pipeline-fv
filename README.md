@@ -107,6 +107,13 @@ pose, intrinsics, metadata, and SLAM-map artifacts under
 took approximately 20 seconds. Peak VRAM still needs to be recorded during the
 full run.
 
+The subsequent `make colmap-smoke` conversion is verified as well. It extracted
+all 20 RGB frames, wrote 20 pose records and one PINHOLE camera with
+`fx=fy=957.81`, `cx=640`, `cy=480`, and produced a non-empty SLAM-map point
+cloud. The conversion wrapper validates these counts automatically before it
+reports success. Upstream's `Extracted 19 frames` message refers to the final
+zero-based frame index (frames 0 through 19), not a missing frame.
+
 ## Mac-to-Ubuntu workflow
 
 Code and documentation are edited and committed on macOS. GPU commands run on
@@ -252,6 +259,8 @@ runs out of memory while loading on this GPU before the first frame.
 `make colmap-smoke` uses the pinned ViPE conversion functions but does not
 require a dense-depth ZIP when converting from the SLAM map. This corrects an
 upstream v1.2.0 precondition that checks for that unused file.
+It then verifies one camera record, matching image-file and pose-record counts,
+and at least one 3D point before allowing Splatfacto training to continue.
 
 For a GPU with substantially more memory, opt into the original masks and
 dense-depth path explicitly:

@@ -13,6 +13,7 @@ if [[ "${mode}" != "smoke" && "${mode}" != "full" ]]; then
 fi
 
 require_conda
+require_command ffprobe
 dataset_name="${DATASET_NAME:-zavod70}"
 sequence_name="${dataset_name}"
 if [[ "${mode}" == "smoke" ]]; then
@@ -43,4 +44,35 @@ for required in cameras.txt images.txt points3D.txt; do
   fi
 done
 
+rgb_artifact="${input}/rgb/${sequence_name}.mp4"
+expected_frames="$({ ffprobe \
+  -v error \
+  -count_frames \
+  -select_streams v:0 \
+  -show_entries stream=nb_read_frames \
+  -of default=nokey=1:noprint_wrappers=1 \
+  "${rgb_artifact}"; } | tr -d '[:space:]')"
+image_files="$(find "${result}/images" -maxdepth 1 -type f -name 'frame_*.jpg' | wc -l | tr -d '[:space:]')"
+image_records="$(awk '!/^#/ && NF { count++ } END { print count + 0 }' "${result}/images.txt")"
+camera_records="$(awk '!/^#/ && NF { count++ } END { print count + 0 }' "${result}/cameras.txt")"
+point_records="$(awk '!/^#/ && NF { count++ } END { print count + 0 }' "${result}/points3D.txt")"
+
+if [[ ! "${expected_frames}" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Could not determine frame count for ViPE RGB artifact: ${rgb_artifact}" >&2
+  exit 1
+fi
+if [[ "${image_files}" -ne "${expected_frames}" || "${image_records}" -ne "${expected_frames}" ]]; then
+  echo "COLMAP image count mismatch: expected=${expected_frames}, files=${image_files}, records=${image_records}" >&2
+  exit 1
+fi
+if [[ "${camera_records}" -ne 1 ]]; then
+  echo "Expected one COLMAP camera record, found ${camera_records}." >&2
+  exit 1
+fi
+if [[ "${point_records}" -lt 1 ]]; then
+  echo "COLMAP point cloud is empty: ${result}/points3D.txt" >&2
+  exit 1
+fi
+
+echo "Validated COLMAP: cameras=${camera_records}, images=${image_records}, points=${point_records}"
 echo "COLMAP dataset: ${result}"

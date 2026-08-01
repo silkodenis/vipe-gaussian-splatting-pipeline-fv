@@ -80,6 +80,11 @@ The generated `images.txt` stores paths such as `images/frame_000000.jpg`.
 For Nerfstudio, both `--colmap-path` and `--images-path` are therefore set to
 `.` relative to the sequence root.
 
+After conversion, the wrapper compares the RGB artifact's probed frame count
+with both the extracted JPEG count and non-comment `images.txt` records. It
+also requires exactly one camera and a non-empty `points3D.txt`, so a partial
+conversion cannot silently proceed to training.
+
 ## Splatfacto stage
 
 The smoke run trains for 3,000 iterations. The full run trains for 30,000.
