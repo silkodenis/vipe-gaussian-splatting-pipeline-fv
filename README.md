@@ -107,16 +107,57 @@ the Ubuntu machine over SSH.
 git push
 
 # Ubuntu, through SSH
-cd /path/to/FarsightVisionTestCase
+cd /path/to/vipe-gaussian-splatting-pipeline-fv
 git pull --ff-only
 ```
 
-The dataset is not transferred through Git. Copy the archive separately:
+## Dataset archive
+
+The dataset is distributed separately and must not be committed to Git. Obtain
+the authorized archive from the dataset provider and place it in the repository
+root with this exact default name:
+
+```text
+zavod70-20260801T082255Z-1-001.zip
+```
+
+For example, copy it from the development machine to the Ubuntu host:
 
 ```bash
 scp zavod70-20260801T082255Z-1-001.zip \
-  user@ubuntu-host:/path/to/FarsightVisionTestCase/
+  user@ubuntu-host:/path/to/vipe-gaussian-splatting-pipeline-fv/
 ```
+
+Then verify and prepare it from the repository root:
+
+```bash
+test -f zavod70-20260801T082255Z-1-001.zip
+sha256sum zavod70-20260801T082255Z-1-001.zip
+make inspect
+make prepare
+```
+
+Expected source identity:
+
+| Property | Expected value |
+| --- | --- |
+| SHA-256 | `d17b0a89fcb59ea22e5d89de95beb9a36eb42a6119620b4959b35763bbece1c0` |
+| Files | 126 contiguous JPEG frames, indices 1 through 126 |
+| Uncompressed bytes | 1,074,302,976 |
+
+Do not continue if the checksum or frame range differs. To use another archive,
+copy `.env.example` to `.env` and set `DATASET_ARCHIVE`; document its checksum
+and provenance in the final report.
+
+The verified preparation result on Ubuntu is:
+
+| Output | Resolution | FPS | Frames |
+| --- | --- | --- | --- |
+| `data/interim/zavod70-smoke.mp4` | 1280×960 | 1 | 20 |
+| `data/interim/zavod70.mp4` | 1280×960 | 1 | 126 |
+
+The source ZIP, extracted JPEGs, manifest, and MP4 files remain local and are
+covered by `.gitignore`.
 
 ## Quick start on Ubuntu
 
