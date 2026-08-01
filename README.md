@@ -120,6 +120,15 @@ Nerfstudio 1.1.5, PyTorch 2.1.2+cu118, NumPy 1.26.4, `tinycudann` 1.7, CUDA
 all 3,000 iterations without an out-of-memory error; the final logged rate was
 approximately 23.3 ms/iteration and 52.8 M rays/s.
 
+The full 126-frame ViPE and COLMAP stages are verified too. They consumed every
+prepared frame and produced 126 poses, one camera (`fx=fy=953.60`, `cx=640`,
+`cy=480`), and 326,047 initialization points. The first full Splatfacto attempt
+reached step 7,291 before its default Gaussian densification exceeded the
+RTX 4050's 5.64 GiB of usable VRAM. The full preset now uses system-RAM image
+caching, stops densification at step 6,000, reduces viewer chunks, and supports
+checkpoint continuation. Final completion of the revised full run is pending
+verification.
+
 ## Mac-to-Ubuntu workflow
 
 Code and documentation are edited and committed on macOS. GPU commands run on
@@ -216,7 +225,9 @@ Both videos use 1 FPS to preserve the capture timing and are resized to
 if width, FPS, or frame counts differ from the expected 20/126 frames.
 
 To override defaults, copy `.env.example` to `.env` and edit the values before
-running `make`. The local `.env` file is ignored by Git.
+running `make`. The local `.env` file is ignored by Git. The example also
+documents the reference GPU's Splatfacto memory limits; keep those defaults for
+a 6 GiB card.
 
 ### 3. Install pinned GPU environments
 
@@ -320,6 +331,29 @@ make colmap-full
 make splat-full
 make validate-splat-full
 ```
+
+The full preset is deliberately sized for the verified 6 GiB RTX 4050. It
+keeps source images in CPU memory, stops adding/splitting Gaussians at step
+6,000, and continues optimizing the retained Gaussians through step 29,999.
+The viewer remains available, but avoid leaving a live high-resolution view
+rendering during this low-VRAM run.
+
+Nerfstudio saves a checkpoint every 2,000 steps. If training is interrupted or
+runs out of memory, do not restart the completed iterations. Pull the latest
+project revision and resume the newest checkpoint with:
+
+```bash
+git pull --ff-only
+make resume-splat-full
+make validate-splat-full
+make view-splat-full
+```
+
+The resume wrapper calculates the remaining iteration count because
+Nerfstudio treats `--max-num-iterations` as an *additional* count after loading
+a checkpoint. For example, `step-000006000.ckpt` resumes at 6,001 and runs
+23,999 more iterations, ending at the original target step 29,999. A resumed
+run is written to a new timestamped directory; the source checkpoint is kept.
 
 ### 6. Render the demo
 

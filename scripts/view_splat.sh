@@ -21,7 +21,12 @@ if [[ "${mode}" == "smoke" ]]; then
   experiment="${dataset_name}-smoke"
 fi
 run_root="${PROJECT_ROOT}/artifacts/splatfacto/${experiment}/splatfacto"
-config="$(find "${run_root}" -mindepth 2 -maxdepth 2 -type f -name config.yml -print | LC_ALL=C sort | tail -n 1)"
+checkpoint="$(
+  find "${run_root}" -mindepth 3 -maxdepth 3 -type f -name 'step-*.ckpt' -print \
+    | LC_ALL=C sort \
+    | tail -n 1
+)"
+config="$(dirname -- "$(dirname -- "${checkpoint}")")/config.yml"
 
 conda_cuda_run "${NERFSTUDIO_ENV_NAME}" ns-viewer \
   --load-config "${config}" \

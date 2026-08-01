@@ -180,3 +180,31 @@ Then open the local URL printed by the training process.
 
 For an already trained smoke model, start the viewer with
 `make view-splat-smoke`; for the full model use `make view-splat-full`.
+
+## Full Splatfacto run fails during `gsplat.strategy.ops.split`
+
+An OOM from `torch.cat` inside `gsplat` splitting means the Gaussian population
+outgrew VRAM during densification. It does not invalidate the ViPE poses,
+COLMAP data, or already saved Splatfacto checkpoint. On the reference RTX 4050,
+the unbounded default failed near step 7,291 while attempting another 382 MiB
+allocation.
+
+Pull the low-VRAM preset and resume rather than starting from zero:
+
+```bash
+git pull --ff-only
+make resume-splat-full
+```
+
+The command normally finds the checkpoint from step 6,000, moves the image
+cache to system RAM, prevents further Gaussian splitting, reduces interactive
+viewer chunks, and runs only the remaining 23,999 iterations. Do not delete
+`artifacts/splatfacto` before resuming. After completion, run:
+
+```bash
+make validate-splat-full
+make view-splat-full
+```
+
+Validation rejects partial checkpoints, so a saved step 6,000 model cannot be
+mistaken for the finished step 29,999 result.

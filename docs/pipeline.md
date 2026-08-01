@@ -106,6 +106,14 @@ command return after the final checkpoint is written. The wrapper then requires
 a non-empty `config.yml` and `step-*.ckpt`. `view_splat.sh` reopens the newest
 validated run for interactive inspection.
 
+On the 6 GiB reference GPU, the full preset caches image bytes in system RAM,
+sets `stop_split_at=6000`, limits viewer chunks to 8,192 rays, and uses a
+128 MiB PyTorch allocator split limit. This bounds memory after densification;
+later iterations continue optimizing the fixed Gaussian population. Interrupted
+runs are continued with `make resume-splat-full`. The wrapper locates the newest
+checkpoint and converts the absolute 30,000-iteration target to Nerfstudio's
+required additional iteration count.
+
 Before accepting the result, inspect:
 
 - camera frustums and trajectory continuity;

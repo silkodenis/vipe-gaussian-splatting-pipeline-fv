@@ -24,21 +24,35 @@ if [[ ! -d "${run_root}" ]]; then
   exit 1
 fi
 
-config="$(find "${run_root}" -mindepth 2 -maxdepth 2 -type f -name config.yml -print | LC_ALL=C sort | tail -n 1)"
-if [[ -z "${config}" || ! -s "${config}" ]]; then
-  echo "No non-empty Splatfacto config found under ${run_root}" >&2
+checkpoint="$(
+  find "${run_root}" -mindepth 3 -maxdepth 3 -type f -name 'step-*.ckpt' -print \
+    | LC_ALL=C sort \
+    | tail -n 1
+)"
+if [[ -z "${checkpoint}" || ! -s "${checkpoint}" ]]; then
+  echo "No non-empty Splatfacto checkpoint found under ${run_root}" >&2
   exit 1
 fi
 
-run_dir="$(dirname -- "${config}")"
-checkpoint_dir="${run_dir}/nerfstudio_models"
-if [[ ! -d "${checkpoint_dir}" ]]; then
-  echo "Splatfacto checkpoint directory not found: ${checkpoint_dir}" >&2
+run_dir="$(dirname -- "$(dirname -- "${checkpoint}")")"
+config="${run_dir}/config.yml"
+if [[ ! -s "${config}" ]]; then
+  echo "Checkpoint has no matching non-empty config: ${config}" >&2
   exit 1
 fi
-checkpoint="$(find "${checkpoint_dir}" -maxdepth 1 -type f -name 'step-*.ckpt' -print | LC_ALL=C sort | tail -n 1)"
-if [[ -z "${checkpoint}" || ! -s "${checkpoint}" ]]; then
-  echo "No non-empty Splatfacto checkpoint found under ${checkpoint_dir}" >&2
+
+checkpoint_name="$(basename -- "${checkpoint}")"
+checkpoint_step="${checkpoint_name#step-}"
+checkpoint_step="${checkpoint_step%.ckpt}"
+checkpoint_step=$((10#${checkpoint_step}))
+if [[ "${mode}" == "smoke" ]]; then
+  expected_final_step=2999
+else
+  expected_final_step=29999
+fi
+if (( checkpoint_step < expected_final_step )); then
+  echo "Splatfacto ${mode} checkpoint is incomplete: step ${checkpoint_step}, expected at least ${expected_final_step}." >&2
+  echo "Continue it with: make resume-splat-${mode}" >&2
   exit 1
 fi
 
