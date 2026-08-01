@@ -103,6 +103,13 @@ does not create `depth/*.zip`; `scripts/convert_slam_map_to_colmap.py` checks
 the RGB, poses, intrinsics, and SLAM map that this conversion path actually
 uses.
 
+## FFmpeg reports `not enough frames to estimate rate`
+
+This warning can appear while ViPE saves the short 20-frame smoke artifact. It
+is non-fatal when the log continues with `Saving SLAM map` and
+`Finished processing zavod70-smoke`. Proceed with `make colmap-smoke`; that
+command validates every artifact required by the SLAM-map conversion path.
+
 ## Nerfstudio cannot find images
 
 ViPE writes image names with an `images/` prefix. The training wrapper handles

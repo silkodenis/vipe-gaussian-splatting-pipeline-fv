@@ -99,6 +99,14 @@ The successful validation command is:
 make diagnose-vipe
 ```
 
+The 20-frame ViPE smoke run is also verified on this host with the default
+`low-vram` profile. It used a 56-slot SLAM buffer, completed both SLAM passes,
+reduced bundle-adjustment energy throughout optimization, and saved the RGB,
+pose, intrinsics, metadata, and SLAM-map artifacts under
+`artifacts/vipe/smoke`. With model weights already cached, the logged ViPE run
+took approximately 20 seconds. Peak VRAM still needs to be recorded during the
+full run.
+
 ## Mac-to-Ubuntu workflow
 
 Code and documentation are edited and committed on macOS. GPU commands run on
