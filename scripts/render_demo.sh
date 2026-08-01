@@ -27,9 +27,10 @@ if [[ ! -f "${camera_path}" ]]; then
 fi
 
 mkdir -p "$(dirname -- "${output}")"
-conda_cuda_run "${NERFSTUDIO_ENV_NAME}" ns-render camera-path \
+conda_cuda_run "${NERFSTUDIO_ENV_NAME}" python "${SCRIPT_DIR}/render_camera_path.py" \
   --load-config "${load_config}" \
-  --camera-path-filename "${camera_path}" \
-  --output-path "${output}"
+  --camera-path "${camera_path}" \
+  --output "${output}" \
+  --settings "${PROJECT_ROOT}/configs/splatfacto.yaml"
 
 echo "Demo video: ${output}"

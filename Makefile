@@ -13,7 +13,7 @@ EXPECTED_FIRST_FRAME ?= 1
 EXPECTED_LAST_FRAME ?= 126
 EXPECTED_UNCOMPRESSED_BYTES ?= 1074302976
 
-.PHONY: bootstrap check inspect prepare setup setup-vipe diagnose diagnose-vipe setup-splatfacto diagnose-splatfacto pipeline-smoke pipeline-full vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full resume-splat-smoke resume-splat-full validate-splat-smoke validate-splat-full view-splat-smoke view-splat-full
+.PHONY: bootstrap check inspect prepare setup setup-vipe diagnose diagnose-vipe setup-splatfacto diagnose-splatfacto pipeline-smoke pipeline-full vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full resume-splat-smoke resume-splat-full validate-splat-smoke validate-splat-full view-splat-smoke view-splat-full render-splat-smoke render-splat-full
 
 bootstrap:
 	./scripts/bootstrap_ubuntu.sh
@@ -111,3 +111,9 @@ view-splat-smoke:
 
 view-splat-full:
 	./scripts/view_splat.sh full
+
+render-splat-smoke:
+	./scripts/render_splat.sh smoke
+
+render-splat-full:
+	./scripts/render_splat.sh full

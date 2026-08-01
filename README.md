@@ -418,20 +418,26 @@ a one-second transition and lasts 125 seconds, preserving the real capture
 timing.
 
 In the Viewer, open `RENDER`, play the preloaded spline, remove or move
-keyframes if desired, and adjust transition time, spline tension, FOV,
-resolution, and crop. `Generate Command` saves the edited path under the same
-`camera_paths` directory and displays its exact `ns-render camera-path`
-command.
-
-To render a selected JSON with the project wrapper, copy it to
-`configs/camera_path.json` and run:
+keyframes if desired, and adjust transition time, spline tension, FOV, and
+resolution. Click `Generate Command`: this saves a timestamped JSON containing
+the dense render trajectory. The displayed raw `ns-render` command does not
+need to be copied or run. Stop the Viewer with `Ctrl+C`, then run:
 
 ```bash
-./scripts/render_demo.sh \
-  artifacts/splatfacto/zavod70/splatfacto/<run-id>/config.yml
+make render-splat-full
 ```
 
-The result is written to `renders/zavod70-demo.mp4`.
+The target automatically selects the newest timestamped Viewer JSON and the
+validated full-model config. Before rendering, it creates a derived
+`*.project.json` and enforces the versioned crop and background settings from
+`configs/splatfacto.yaml`; the original Viewer JSON is preserved. The result is
+written to `renders/zavod70/<timestamp>.mp4`.
+
+To render a specific older Viewer path instead of the newest one:
+
+```bash
+CAMERA_PATH_FILE=/absolute/path/to/camera-path.json make render-splat-full
+```
 
 For a less dense editable spline, select every Nth recovered camera without
 changing the reconstruction:
