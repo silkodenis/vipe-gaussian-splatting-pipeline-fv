@@ -398,7 +398,7 @@ their source-image order and appear as preloaded keyframes in the `RENDER` tab;
 manual camera selection is not required. The Viewer also starts with this crop:
 
 ```text
-background RGB: 128, 128, 128
+background:     #242424 (RGB 36, 36, 36)
 center:         0, 0, 0
 scale:          2.5, 1.94, 1
 rotation:       0, 0, 0
