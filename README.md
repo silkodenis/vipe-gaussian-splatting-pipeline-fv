@@ -37,13 +37,10 @@ pipeline has been validated.
 
 Pinned versions live in [`configs/versions.env`](configs/versions.env).
 
-## Requirements
+## Host requirements
 
 - Ubuntu Linux with an NVIDIA GPU and a driver compatible with CUDA 12.8
-- Conda or Miniconda
-- Git
-- Python 3
-- FFmpeg and FFprobe
+- `sudo` access for the one-time bootstrap
 - At least 20 GB of free disk space for environments and generated artifacts
 
 The target laptop has an RTX 4070 with limited VRAM, so the initial pipeline
@@ -72,13 +69,17 @@ scp zavod70-20260801T082255Z-1-001.zip \
 
 ## Quick start on Ubuntu
 
-### 1. Check the machine
+### 1. Bootstrap and check the machine
 
 ```bash
+./scripts/bootstrap_ubuntu.sh
 ./scripts/check_environment.sh gpu
 ```
 
-Save the output for the final reproducibility report.
+The idempotent bootstrap installs the required Ubuntu packages and a pinned,
+checksum-verified Miniforge distribution. It does not require manual Conda
+activation or modification of shell startup files. Save the environment check
+output for the final reproducibility report.
 
 ### 2. Inspect and prepare the dataset
 
@@ -106,7 +107,9 @@ make setup-splatfacto
 ```
 
 The upstream ViPE checkout is stored under `.cache/vipe` and verified against
-the pinned release commit. Both setup commands are safe to rerun.
+the pinned release commit. Both setup commands are safe to rerun. They install
+Conda-managed host compilers as well: GCC 14 for CUDA 12.8 and GCC 11 for CUDA
+11.8, avoiding dependence on the host distribution's compiler.
 
 ### 4. Run the smoke pipeline
 
@@ -161,3 +164,12 @@ See [`docs/pipeline.md`](docs/pipeline.md) for stage contracts and
 - Run the smoke pipeline before every full reconstruction on a new machine.
 - Record `nvidia-smi`, environment exports, commands, runtimes, and peak VRAM.
 - Never commit source imagery, EXIF/GPS metadata, checkpoints, or render output.
+
+## Ubuntu 26.04 note
+
+CUDA 12.8 officially qualifies Ubuntu through 24.04 and host GCC versions
+through 14. Ubuntu 26.04 ships GCC 15 and is therefore outside that matrix.
+The project mitigates the compiler mismatch with Conda-managed toolchains, but
+the host OS remains an explicit compatibility risk. If an upstream binary
+fails because of glibc or OS detection, the fallback is an Ubuntu 24.04 CUDA
+container or an Ubuntu 24.04 host installation.

@@ -12,7 +12,7 @@ if [[ "${mode}" != "smoke" && "${mode}" != "full" ]]; then
   exit 2
 fi
 
-require_command conda
+require_conda
 dataset_name="${DATASET_NAME:-zavod70}"
 sequence_name="${dataset_name}"
 if [[ "${mode}" == "smoke" ]]; then
@@ -35,7 +35,7 @@ else
 fi
 
 mkdir -p "${output}"
-conda_run "${NERFSTUDIO_ENV_NAME}" ns-train splatfacto \
+conda_cuda_run "${NERFSTUDIO_ENV_NAME}" ns-train splatfacto \
   --output-dir "${output}" \
   --experiment-name "${experiment}" \
   --max-num-iterations "${iterations}" \

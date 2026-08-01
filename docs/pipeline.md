@@ -1,5 +1,14 @@
 # Pipeline design
 
+## Bootstrap contract
+
+`scripts/bootstrap_ubuntu.sh` is the only supported manual entry point for a
+fresh Ubuntu host. It installs required APT packages and a pinned Miniforge
+installer whose SHA-256 digest is stored in `configs/versions.env`.
+
+GPU libraries are not installed globally. ViPE and Nerfstudio use independent
+Conda environments and independent CUDA-compatible host compilers.
+
 ## Dataset contract
 
 The input is a ZIP containing DJI JPEG files named with a four-digit frame

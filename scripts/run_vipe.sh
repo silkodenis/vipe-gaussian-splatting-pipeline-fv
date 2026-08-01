@@ -12,7 +12,7 @@ if [[ "${mode}" != "smoke" && "${mode}" != "full" ]]; then
   exit 2
 fi
 
-require_command conda
+require_conda
 dataset_name="${DATASET_NAME:-zavod70}"
 vipe_dir="${PROJECT_ROOT}/.cache/vipe"
 
@@ -35,7 +35,7 @@ fi
 mkdir -p "${output}"
 
 pushd "${vipe_dir}" >/dev/null
-conda_run "${VIPE_ENV_NAME}" python run.py \
+conda_cuda_run "${VIPE_ENV_NAME}" python run.py \
   pipeline=no_vda \
   streams=raw_mp4_stream \
   "streams.base_path=${video}" \

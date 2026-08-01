@@ -11,7 +11,7 @@ if [[ $# -lt 1 || $# -gt 2 ]]; then
   exit 2
 fi
 
-require_command conda
+require_conda
 load_config="$(absolute_path "$1")"
 camera_path="$(absolute_path "${2:-configs/camera_path.json}")"
 output="${PROJECT_ROOT}/renders/zavod70-demo.mp4"
@@ -27,7 +27,7 @@ if [[ ! -f "${camera_path}" ]]; then
 fi
 
 mkdir -p "$(dirname -- "${output}")"
-conda_run "${NERFSTUDIO_ENV_NAME}" ns-render camera-path \
+conda_cuda_run "${NERFSTUDIO_ENV_NAME}" ns-render camera-path \
   --load-config "${load_config}" \
   --camera-path-filename "${camera_path}" \
   --output-path "${output}"

@@ -2,7 +2,10 @@ SHELL := /usr/bin/env bash
 
 ARCHIVE ?= zavod70-20260801T082255Z-1-001.zip
 
-.PHONY: check inspect prepare setup-vipe setup-splatfacto vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full
+.PHONY: bootstrap check inspect prepare setup-vipe setup-splatfacto vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full
+
+bootstrap:
+	./scripts/bootstrap_ubuntu.sh
 
 check:
 	./scripts/check_environment.sh gpu

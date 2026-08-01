@@ -1,5 +1,29 @@
 # Troubleshooting
 
+## A prerequisite is missing
+
+Do not install project packages one by one. Run the idempotent bootstrap and
+then collect the complete diagnostic report:
+
+```bash
+./scripts/bootstrap_ubuntu.sh
+./scripts/check_environment.sh gpu
+```
+
+The bootstrap installs system tools and a pinned Miniforge distribution. The
+project scripts locate that Conda installation without requiring `conda init`.
+
+## Ubuntu 26.04 or GCC 15 is detected
+
+CUDA 12.8 officially supports host GCC versions only through 14 and does not
+list Ubuntu 26.04 as a qualified distribution. The setup scripts install GCC
+14 inside the ViPE environment and GCC 11 inside the Nerfstudio environment,
+then explicitly select those compilers for CUDA extension builds.
+
+If compilation still fails because of the host glibc or distribution version,
+do not use `--allow-unsupported-compiler`. Use the planned Ubuntu 24.04 CUDA
+container fallback instead.
+
 ## `nvidia-smi` is missing
 
 Install or repair the proprietary NVIDIA driver before creating Python

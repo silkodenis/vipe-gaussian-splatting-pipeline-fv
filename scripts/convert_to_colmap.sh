@@ -12,7 +12,7 @@ if [[ "${mode}" != "smoke" && "${mode}" != "full" ]]; then
   exit 2
 fi
 
-require_command conda
+require_conda
 dataset_name="${DATASET_NAME:-zavod70}"
 sequence_name="${dataset_name}"
 if [[ "${mode}" == "smoke" ]]; then
@@ -27,7 +27,7 @@ if [[ ! -d "${input}" ]]; then
   exit 1
 fi
 
-conda_run "${VIPE_ENV_NAME}" python "${vipe_dir}/scripts/vipe_to_colmap.py" \
+conda_cuda_run "${VIPE_ENV_NAME}" python "${vipe_dir}/scripts/vipe_to_colmap.py" \
   "${input}" \
   --sequence "${sequence_name}" \
   --use_slam_map \
