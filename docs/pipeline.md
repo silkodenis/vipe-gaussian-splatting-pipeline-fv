@@ -132,9 +132,16 @@ Before accepting the result, inspect:
 
 ## Rendering stage
 
-Create the final path in the Nerfstudio viewer. Prefer a slow trajectory near
-the original capture manifold; aggressive moves into unseen space will expose
-holes and extrapolation artifacts. Export the path JSON and render it with
+`make view-splat-full` uses the Nerfstudio dataparser API with `eval_mode=all`
+to recover all 126 ordered camera poses, including the cameras held out by the
+training/evaluation interval split. It converts them to editable Viewer
+keyframes and preloads the path without modifying the installed Nerfstudio
+package. The configured crop is applied to the interactive viewport and is
+written into the final JSON by the Viewer's `Generate Command` action.
+
+Prefer a slow trajectory near the original capture manifold; aggressive moves
+into unseen space will expose holes and extrapolation artifacts. Edit the
+preloaded spline as needed, export the final path JSON, and render it with
 `scripts/render_demo.sh`.
 
 ## Execution records

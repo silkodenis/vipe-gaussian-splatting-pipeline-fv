@@ -20,3 +20,13 @@ training:
 render:
   camera_path: configs/camera_path.json
   output: renders/zavod70-demo.mp4
+  dataset_path:
+    keyframe_stride: 1
+    transition_seconds: 0.1
+    fps: 30
+    resolution: [1280, 960]
+    crop:
+      center: [0.0, 0.0, 0.0]
+      scale: [1.0, 1.0, 1.0]
+      rotation: [0.0, 0.0, 0.0]
+      background_rgb: [128, 128, 128]

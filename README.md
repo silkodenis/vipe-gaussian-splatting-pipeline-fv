@@ -392,8 +392,33 @@ run is written to a new timestamped directory; the source checkpoint is kept.
 
 ### 6. Render the demo
 
-Open the Nerfstudio viewer through an SSH tunnel, create a camera path, and
-export it as `configs/camera_path.json`. Then run:
+`make view-splat-full` first generates an editable path from every recovered
+dataset camera through the pinned Nerfstudio Python API. The 126 cameras retain
+their source-image order and appear as preloaded keyframes in the `RENDER` tab;
+manual camera selection is not required. The Viewer also starts with this crop:
+
+```text
+background RGB: 128, 128, 128
+center:         0, 0, 0
+scale:          1, 1, 1
+rotation:       0, 0, 0
+```
+
+The generated editable path is machine-local and is regenerated on every
+Viewer launch:
+
+```text
+artifacts/colmap/full/zavod70/camera_paths/ordered-dataset-cameras.json
+```
+
+In the Viewer, open `RENDER`, play the preloaded spline, remove or move
+keyframes if desired, and adjust transition time, spline tension, FOV,
+resolution, and crop. `Generate Command` saves the edited path under the same
+`camera_paths` directory and displays its exact `ns-render camera-path`
+command.
+
+To render a selected JSON with the project wrapper, copy it to
+`configs/camera_path.json` and run:
 
 ```bash
 ./scripts/render_demo.sh \
@@ -401,6 +426,18 @@ export it as `configs/camera_path.json`. Then run:
 ```
 
 The result is written to `renders/zavod70-demo.mp4`.
+
+For a less dense editable spline, select every Nth recovered camera without
+changing the reconstruction:
+
+```bash
+CAMERA_PATH_STRIDE=4 make view-splat-full
+```
+
+The last camera is always retained. `CAMERA_PATH_TRANSITION_SECONDS`,
+`CAMERA_PATH_RENDER_WIDTH`, `CAMERA_PATH_RENDER_HEIGHT`, and `CAMERA_PATH_FPS`
+override the generated path defaults. These settings affect only the editable
+render trajectory, never the trained checkpoint.
 
 ## Clean-room acceptance sequence
 
