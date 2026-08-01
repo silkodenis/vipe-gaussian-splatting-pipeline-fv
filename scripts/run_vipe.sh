@@ -35,7 +35,7 @@ fi
 mkdir -p "${output}"
 
 pushd "${vipe_dir}" >/dev/null
-conda_cuda_run "${VIPE_ENV_NAME}" python run.py \
+conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py \
   pipeline=no_vda \
   streams=raw_mp4_stream \
   "streams.base_path=${video}" \

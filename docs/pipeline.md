@@ -9,6 +9,11 @@ installer whose SHA-256 digest is stored in `configs/versions.env`.
 GPU libraries are not installed globally. ViPE and Nerfstudio use independent
 Conda environments and independent CUDA-compatible host compilers.
 
+ViPE v1.2.0 uses a two-layer environment: `envs/cu128.yml` supplies CUDA,
+native libraries, and `uv`; `uv sync --frozen` creates `.cache/vipe/.venv`
+from the release's committed `uv.lock`. Project commands therefore run through
+both `conda run` and `uv run`.
+
 ## Dataset contract
 
 The input is a ZIP containing DJI JPEG files named with a four-digit frame

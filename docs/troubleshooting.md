@@ -33,12 +33,16 @@ environments. CUDA packages inside Conda do not replace the host driver.
 
 Confirm that the active driver supports CUDA 12.8, then check:
 
-```bash
-conda run -n vipe nvcc --version
-conda run -n vipe python -c "import torch; print(torch.__version__, torch.version.cuda)"
-```
+Run `make diagnose-vipe` to report the pinned commit, NVCC, the Conda host
+compiler, uv, PyTorch, CUDA runtime visibility, and the ViPE CLI status.
 
 Do not install ViPE into the Nerfstudio environment.
+
+## `envs/base.yml` is missing
+
+ViPE v1.2.0 uses `envs/cu128.yml`; `base.yml` belongs to a different repository
+revision. Pull commit `fix: follow the ViPE v1.2.0 uv installation layout` and
+rerun `make setup-vipe`. The existing pinned checkout is reused.
 
 ## ViPE runs out of GPU memory
 

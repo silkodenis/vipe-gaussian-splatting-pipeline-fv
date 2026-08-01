@@ -26,7 +26,8 @@ videos are intentionally excluded from Git.
 The supported execution target is Ubuntu with an NVIDIA GPU. Two isolated
 Conda environments are used:
 
-- `vipe`: ViPE v1.2.0 and its upstream CUDA 12.8 environment.
+- `vipe`: ViPE v1.2.0 native tooling and CUDA 12.8; the locked Python
+  environment is managed by `uv` under `.cache/vipe/.venv`.
 - `nerfstudio`: Nerfstudio v1.1.5, PyTorch 2.1.2, and CUDA toolkit 11.8.
 
 This follows ViPE's official Conda-based installation and keeps its compiled
@@ -142,9 +143,17 @@ make setup-splatfacto
 ```
 
 The upstream ViPE checkout is stored under `.cache/vipe` and verified against
-the pinned release commit. Both setup commands are safe to rerun. They install
+the pinned release commit. ViPE is installed with the release's official
+`envs/cu128.yml` plus `uv sync --frozen`, so `uv.lock` controls all Python
+dependencies. Both setup commands are safe to rerun. They install
 Conda-managed host compilers as well: GCC 14 for CUDA 12.8 and GCC 11 for CUDA
 11.8, avoiding dependence on the host distribution's compiler.
+
+Verify ViPE after installation with:
+
+```bash
+make diagnose-vipe
+```
 
 ### 4. Run the smoke pipeline
 

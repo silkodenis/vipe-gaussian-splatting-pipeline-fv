@@ -27,11 +27,13 @@ if [[ ! -d "${input}" ]]; then
   exit 1
 fi
 
-conda_cuda_run "${VIPE_ENV_NAME}" python "${vipe_dir}/scripts/vipe_to_colmap.py" \
+pushd "${vipe_dir}" >/dev/null
+conda_cuda_run "${VIPE_ENV_NAME}" uv run python scripts/vipe_to_colmap.py \
   "${input}" \
   --sequence "${sequence_name}" \
   --use_slam_map \
   --output "${output_base}"
+popd >/dev/null
 
 result="${output_base}/${sequence_name}"
 for required in cameras.txt images.txt points3D.txt; do
