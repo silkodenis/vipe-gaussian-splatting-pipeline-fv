@@ -12,6 +12,7 @@ import subprocess
 import sys
 import zipfile
 from datetime import datetime, timezone
+from fractions import Fraction
 from pathlib import Path
 
 
@@ -100,6 +101,45 @@ def run_ffmpeg(
     subprocess.run(command, check=True)
 
 
+def validate_video(output: Path, expected_width: int, expected_fps: float, expected_frames: int) -> dict[str, object]:
+    command = [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height,nb_frames,r_frame_rate",
+        "-of",
+        "json",
+        str(output),
+    ]
+    result = subprocess.run(command, check=True, capture_output=True, text=True)
+    payload = json.loads(result.stdout)
+    streams = payload.get("streams", [])
+    if len(streams) != 1:
+        raise RuntimeError(f"Expected one video stream in {output}, found {len(streams)}")
+
+    stream = streams[0]
+    actual_width = int(stream["width"])
+    actual_frames = int(stream["nb_frames"])
+    actual_fps = float(Fraction(stream["r_frame_rate"]))
+    if actual_width != expected_width:
+        raise RuntimeError(f"Unexpected width in {output}: {actual_width}, expected {expected_width}")
+    if actual_frames != expected_frames:
+        raise RuntimeError(f"Unexpected frame count in {output}: {actual_frames}, expected {expected_frames}")
+    if abs(actual_fps - expected_fps) > 1e-6:
+        raise RuntimeError(f"Unexpected FPS in {output}: {actual_fps}, expected {expected_fps}")
+
+    return {
+        "path": str(output),
+        "width": actual_width,
+        "height": int(stream["height"]),
+        "fps": actual_fps,
+        "frames": actual_frames,
+    }
+
+
 def main() -> int:
     args = parse_args()
     archive_path = args.archive.expanduser().resolve()
@@ -167,22 +207,30 @@ def main() -> int:
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     interim_dir = project_root / "data" / "interim"
+    smoke_frames = min(args.smoke_frames, len(frames))
+    smoke_video = interim_dir / f"{args.dataset_name}-smoke.mp4"
+    full_video = interim_dir / f"{args.dataset_name}.mp4"
     run_ffmpeg(
         images_dir,
-        interim_dir / f"{args.dataset_name}-smoke.mp4",
+        smoke_video,
         frames[0][0],
         args.fps,
         args.width,
-        min(args.smoke_frames, len(frames)),
+        smoke_frames,
     )
     run_ffmpeg(
         images_dir,
-        interim_dir / f"{args.dataset_name}.mp4",
+        full_video,
         frames[0][0],
         args.fps,
         args.width,
         None,
     )
+    videos = [
+        validate_video(smoke_video, args.width, args.fps, smoke_frames),
+        validate_video(full_video, args.width, args.fps, len(frames)),
+    ]
+    print(json.dumps({"validated_videos": videos}, indent=2))
     print(f"Prepared dataset under {project_root / 'data'}")
     return 0
 

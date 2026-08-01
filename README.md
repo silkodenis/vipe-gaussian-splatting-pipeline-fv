@@ -148,7 +148,8 @@ data/interim/zavod70.mp4        # all 126 frames
 ```
 
 Both videos use 1 FPS to preserve the capture timing and are resized to
-1280 px width.
+1280 px width. FFprobe validation is part of `make prepare`; the command fails
+if width, FPS, or frame counts differ from the expected 20/126 frames.
 
 To override defaults, copy `.env.example` to `.env` and edit the values before
 running `make`. The local `.env` file is ignored by Git.
