@@ -35,8 +35,13 @@ Prepared video parameters:
 ## ViPE stage
 
 ViPE consumes MP4 files. The project uses the `no_vda` pipeline initially to
-reduce GPU memory pressure and sets `kf_gap_sec=1.0` so adjacent one-second
-captures can become keyframes.
+reduce GPU memory pressure and sets `pipeline.init.instance.kf_gap_sec=1.0` so
+adjacent one-second captures can become keyframes.
+
+Before inference, the wrapper runs Hydra with `--cfg job` and writes the
+resolved configuration to `composed-config.yaml` in the output directory.
+This validates the complete override path without loading models or using GPU
+memory.
 
 Outputs required by the next stage are:
 

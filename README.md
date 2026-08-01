@@ -223,6 +223,12 @@ make colmap-smoke
 make splat-smoke
 ```
 
+`make vipe-smoke` first performs a Hydra composition-only preflight and saves
+the exact resolved job configuration as
+`artifacts/vipe/smoke/composed-config.yaml`. Models and CUDA processing start
+only if every override is valid. The one-second capture cadence is represented
+by `pipeline.init.instance.kf_gap_sec=1.0`.
+
 Inspect camera poses, depth, the COLMAP point cloud, and GPU memory before
 starting the full run.
 

@@ -69,6 +69,7 @@ conda_cuda_run() {
     CC=x86_64-conda-linux-gnu-cc \
     CXX=x86_64-conda-linux-gnu-c++ \
     CUDAHOSTCXX=x86_64-conda-linux-gnu-c++ \
+    HYDRA_FULL_ERROR="${HYDRA_FULL_ERROR:-1}" \
     MAX_JOBS="${MAX_JOBS:-4}" \
     "$@"
 }

@@ -51,6 +51,14 @@ rerun `make setup-vipe`. The existing pinned checkout is reused.
 3. Re-run dataset preparation with a smaller even width, for example 960.
 4. Validate on the 20-frame smoke video before retrying the full sequence.
 
+## Hydra rejects `pipeline.init.kf_gap_sec`
+
+ViPE v1.2.0 nests this setting under the instance configuration. Pull commit
+`fix: validate ViPE Hydra overrides before inference` and rerun
+`make vipe-smoke`; the supported override is
+`pipeline.init.instance.kf_gap_sec=1.0`. The wrapper now performs a composition
+preflight before loading any model.
+
 ## Camera tracking is fragmented
 
 The source drone moves about 9.4 m between adjacent captures. Inspect the

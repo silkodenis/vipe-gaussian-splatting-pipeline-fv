@@ -34,18 +34,27 @@ if [[ ! -f "${video}" ]]; then
 fi
 mkdir -p "${output}"
 
-pushd "${vipe_dir}" >/dev/null
-conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py \
-  pipeline=no_vda \
-  streams=raw_mp4_stream \
-  "streams.base_path=${video}" \
-  streams.frame_start=0 \
-  streams.frame_end=1000 \
-  streams.frame_skip=1 \
-  pipeline.init.kf_gap_sec=1.0 \
-  "pipeline.output.path=${output}" \
-  pipeline.output.save_artifacts=true \
+vipe_args=(
+  pipeline=no_vda
+  streams=raw_mp4_stream
+  "streams.base_path=${video}"
+  streams.frame_start=0
+  streams.frame_end=1000
+  streams.frame_skip=1
+  pipeline.init.instance.kf_gap_sec=1.0
+  "pipeline.output.path=${output}"
+  pipeline.output.save_artifacts=true
   pipeline.output.save_slam_map=true
+)
+
+pushd "${vipe_dir}" >/dev/null
+config_path="${output}/composed-config.yaml"
+config_tmp="${config_path}.tmp"
+conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py \
+  "${vipe_args[@]}" --cfg job >"${config_tmp}"
+mv "${config_tmp}" "${config_path}"
+echo "ViPE Hydra preflight: OK"
+conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py "${vipe_args[@]}"
 popd >/dev/null
 
 echo "ViPE ${mode} result: ${output}"

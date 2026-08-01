@@ -5,7 +5,9 @@ dataset:
 
 pipeline:
   name: no_vda
-  keyframe_gap_seconds: 1.0
+  init:
+    instance:
+      kf_gap_sec: 1.0
   frame_start: 0
   frame_end: 1000
   frame_skip: 1
