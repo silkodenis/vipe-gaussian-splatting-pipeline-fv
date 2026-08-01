@@ -162,6 +162,30 @@ Do not add another nested `zavod70` directory. The images must be immediate
 children of `data/input/zavod70/`. Their contents are ignored by Git; only the
 hidden `.gitkeep` placeholder is versioned.
 
+If the dataset was delivered as a ZIP on another machine, copy and unpack it
+over SSH. Run the following on the machine that holds the archive, replacing
+the four placeholder values:
+
+```bash
+LOCAL_ZIP="/path/to/zavod70-20260801T082255Z-1-001.zip"
+UBUNTU_USER="<user>"
+UBUNTU_IP="<ip>"
+UBUNTU_REPO="/path/to/vipe-gaussian-splatting-pipeline-fv"
+
+scp "${LOCAL_ZIP}" \
+  "${UBUNTU_USER}@${UBUNTU_IP}:/tmp/zavod70-dataset.zip"
+
+ssh "${UBUNTU_USER}@${UBUNTU_IP}" \
+  "mkdir -p '${UBUNTU_REPO}/data/input/zavod70' && \
+   unzip -j -n /tmp/zavod70-dataset.zip '*.jpg' \
+     -d '${UBUNTU_REPO}/data/input/zavod70'"
+```
+
+`unzip -j` discards the directory stored inside the ZIP, ensuring that the
+JPEGs land at the required depth. `-n` makes reruns safe by refusing to
+overwrite files already present. The temporary ZIP remains under `/tmp` and is
+not part of the repository.
+
 Then verify and prepare the sequence from the repository root:
 
 ```bash
