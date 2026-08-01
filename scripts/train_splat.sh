@@ -39,8 +39,11 @@ conda_cuda_run "${NERFSTUDIO_ENV_NAME}" ns-train splatfacto \
   --output-dir "${output}" \
   --experiment-name "${experiment}" \
   --max-num-iterations "${iterations}" \
+  --viewer.quit-on-train-completion True \
   colmap \
   --data "${data}" \
   --colmap-path . \
   --images-path . \
   --downscale-factor 1
+
+"${SCRIPT_DIR}/validate_splat.sh" "${mode}"

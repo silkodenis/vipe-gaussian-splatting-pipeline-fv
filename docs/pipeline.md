@@ -100,7 +100,11 @@ conversion cannot silently proceed to training.
 
 The smoke run trains for 3,000 iterations. The full run trains for 30,000.
 Nerfstudio automatically loads the ViPE-generated point cloud to initialize
-the Gaussian representation.
+the Gaussian representation. During training the viewer is available on its
+normal port, but `viewer.quit_on_train_completion=true` lets the automated
+command return after the final checkpoint is written. The wrapper then requires
+a non-empty `config.yml` and `step-*.ckpt`. `view_splat.sh` reopens the newest
+validated run for interactive inspection.
 
 Before accepting the result, inspect:
 

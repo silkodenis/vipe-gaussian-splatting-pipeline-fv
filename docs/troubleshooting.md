@@ -152,6 +152,21 @@ this using:
 
 Run `scripts/train_splat.sh` instead of assembling the command manually.
 
+## Training finished but the command still shows `Use ctrl+c to quit`
+
+The checkpoint is already safe once Nerfstudio prints `Training Finished`.
+Older project revisions left the embedded viewer running after training; press
+`Ctrl+C`, pull the current revision, and validate the completed run without
+retraining:
+
+```bash
+make validate-splat-smoke
+```
+
+Current training commands set `viewer.quit_on_train_completion=True`, validate
+the final config/checkpoint automatically, and return to the shell. Use
+`make view-splat-smoke` when an interactive viewer is wanted later.
+
 ## Viewer is not reachable over SSH
 
 Forward the viewer port from macOS to Ubuntu. Use the port printed by
@@ -162,3 +177,6 @@ ssh -L 7007:localhost:7007 user@ubuntu-host
 ```
 
 Then open the local URL printed by the training process.
+
+For an already trained smoke model, start the viewer with
+`make view-splat-smoke`; for the full model use `make view-splat-full`.

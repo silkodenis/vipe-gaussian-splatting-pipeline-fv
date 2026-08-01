@@ -114,6 +114,12 @@ cloud. The conversion wrapper validates these counts automatically before it
 reports success. Upstream's `Extracted 19 frames` message refers to the final
 zero-based frame index (frames 0 through 19), not a missing frame.
 
+The complete Splatfacto smoke stage is verified on the same RTX 4050 host:
+Nerfstudio 1.1.5, PyTorch 2.1.2+cu118, NumPy 1.26.4, `tinycudann` 1.7, CUDA
+11.8, and GCC 11.4 all passed `make diagnose-splatfacto`. Training completed
+all 3,000 iterations without an out-of-memory error; the final logged rate was
+approximately 23.3 ms/iteration and 52.8 M rays/s.
+
 ## Mac-to-Ubuntu workflow
 
 Code and documentation are edited and committed on macOS. GPU commands run on
@@ -252,6 +258,7 @@ make diagnose-splatfacto
 make vipe-smoke
 make colmap-smoke
 make splat-smoke
+make validate-splat-smoke
 ```
 
 `make vipe-smoke` first performs a Hydra composition-only preflight and saves
@@ -275,6 +282,16 @@ require a dense-depth ZIP when converting from the SLAM map. This corrects an
 upstream v1.2.0 precondition that checks for that unused file.
 It then verifies one camera record, matching image-file and pose-record counts,
 and at least one 3D point before allowing Splatfacto training to continue.
+
+Training keeps the viewer available while optimization is running, saves the
+final checkpoint, validates the newest config/checkpoint pair, and then exits
+automatically. To inspect the trained smoke model again, run:
+
+```bash
+make view-splat-smoke
+```
+
+Stop the standalone viewer with `Ctrl+C` when inspection is complete.
 
 For a GPU with substantially more memory, opt into the original masks and
 dense-depth path explicitly:
@@ -301,6 +318,7 @@ default requires no environment override.
 make vipe-full
 make colmap-full
 make splat-full
+make validate-splat-full
 ```
 
 ### 6. Render the demo

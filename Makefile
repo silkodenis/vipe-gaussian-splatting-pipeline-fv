@@ -8,7 +8,7 @@ PREPARED_WIDTH ?= 1280
 CAPTURE_FPS ?= 1
 SMOKE_FRAMES ?= 20
 
-.PHONY: bootstrap check inspect prepare setup-vipe diagnose-vipe setup-splatfacto diagnose-splatfacto vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full
+.PHONY: bootstrap check inspect prepare setup-vipe diagnose-vipe setup-splatfacto diagnose-splatfacto vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full validate-splat-smoke validate-splat-full view-splat-smoke view-splat-full
 
 bootstrap:
 	./scripts/bootstrap_ubuntu.sh
@@ -60,3 +60,15 @@ splat-smoke:
 
 splat-full:
 	./scripts/train_splat.sh full
+
+validate-splat-smoke:
+	./scripts/validate_splat.sh smoke
+
+validate-splat-full:
+	./scripts/validate_splat.sh full
+
+view-splat-smoke:
+	./scripts/view_splat.sh smoke
+
+view-splat-full:
+	./scripts/view_splat.sh full
