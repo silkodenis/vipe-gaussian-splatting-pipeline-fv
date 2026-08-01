@@ -81,6 +81,10 @@ def install_path_loader(camera_path_file: Path) -> None:
             control_panel._crop_rot.value = tuple(float(value) for value in crop.get("crop_rot", (0, 0, 0)))
             control_panel.crop_viewport = True
 
+        viewer_settings = payload.get("viewer", {})
+        if control_panel is not None and "max_resolution" in viewer_settings:
+            control_panel._max_res.value = int(viewer_settings["max_resolution"])
+
         print(f"Preloaded {len(payload['keyframes'])} editable keyframes from {camera_path_file}")
         return state
 

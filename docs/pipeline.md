@@ -140,6 +140,7 @@ package. The configured crop is applied to the interactive viewport and is
 written into the final JSON by the Viewer's `Generate Command` action.
 The default one-second transition matches the timestamp interval in every
 source filename, producing a 125-second path from the 126 recovered cameras.
+The interactive Viewer starts at its supported maximum resolution of 2048.
 
 Prefer a slow trajectory near the original capture manifold; aggressive moves
 into unseen space will expose holes and extrapolation artifacts. Edit the

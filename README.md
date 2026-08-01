@@ -402,6 +402,7 @@ background RGB: 128, 128, 128
 center:         0, 0, 0
 scale:          2.5, 1.94, 1
 rotation:       0, 0, 0
+viewport Max res: 2048
 ```
 
 The generated editable path is machine-local and is regenerated on every

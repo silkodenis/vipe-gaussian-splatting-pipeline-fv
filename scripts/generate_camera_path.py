@@ -73,6 +73,7 @@ def main() -> int:
     render_width = args.render_width if args.render_width is not None else int(settings["resolution"][0])
     render_height = args.render_height if args.render_height is not None else int(settings["resolution"][1])
     fps = args.fps if args.fps is not None else float(settings["fps"])
+    viewport_max_resolution = int(settings["viewport_max_resolution"])
     crop_center = tuple(float(value) for value in crop["center"])
     crop_scale = tuple(float(value) for value in crop["scale"])
     crop_rotation = tuple(float(value) for value in crop["rotation"])
@@ -82,6 +83,8 @@ def main() -> int:
         raise ValueError("--transition-seconds must be positive")
     if render_width <= 0 or render_height <= 0 or fps <= 0:
         raise ValueError("Render dimensions and FPS must be positive")
+    if viewport_max_resolution <= 0:
+        raise ValueError("Viewport maximum resolution must be positive")
     if any(value <= 0 for value in crop_scale):
         raise ValueError("Crop scale values must be positive")
     if any(value < 0 or value > 255 for value in background_color):
@@ -131,6 +134,7 @@ def main() -> int:
         "seconds": duration,
         "is_cycle": False,
         "smoothness_value": 0.0,
+        "viewer": {"max_resolution": viewport_max_resolution},
         # The Viewer recomputes this dense list after the user edits the path.
         "camera_path": [],
         "crop": {

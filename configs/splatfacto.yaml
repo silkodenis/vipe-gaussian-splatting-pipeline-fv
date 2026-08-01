@@ -25,6 +25,7 @@ render:
     transition_seconds: 1.0
     fps: 30
     resolution: [1280, 960]
+    viewport_max_resolution: 2048
     crop:
       center: [0.0, 0.0, 0.0]
       scale: [2.5, 1.94, 1.0]
