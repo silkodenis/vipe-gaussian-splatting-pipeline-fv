@@ -1,0 +1,58 @@
+# Local datasets and downloaded archives
+/data/raw/
+/data/interim/
+/data/processed/
+/*.zip
+/*.7z
+/*.tar
+/*.tar.gz
+/CV Engineer – Test Assignment.pdf
+
+# Model weights and checkpoints
+/weights/
+/checkpoints/
+*.ckpt
+*.pth
+*.pt
+*.onnx
+*.safetensors
+
+# Generated ViPE, COLMAP, Gaussian Splatting, and render outputs
+/artifacts/
+/outputs/
+/results/
+/renders/
+/vipe_results/
+*.ply
+
+# Local caches and temporary files
+/.cache/
+/tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Python environments and local configuration
+/.venv/
+/venv/
+/.conda/
+.env
+.env.*
+!.env.example
+
+# Native/CUDA build products
+/build/
+/dist/
+*.egg-info/
+*.so
+
+# IDE and operating-system files
+.DS_Store
+.idea/
+.vscode/
+
+# Experiment tracking
+/wandb/
+/mlruns/

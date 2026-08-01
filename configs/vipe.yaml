@@ -1,0 +1,17 @@
+dataset:
+  name: zavod70
+  input_video: data/interim/zavod70.mp4
+  smoke_video: data/interim/zavod70-smoke.mp4
+
+pipeline:
+  name: no_vda
+  keyframe_gap_seconds: 1.0
+  frame_start: 0
+  frame_end: 1000
+  frame_skip: 1
+  save_artifacts: true
+  save_slam_map: true
+
+output:
+  smoke: artifacts/vipe/smoke
+  full: artifacts/vipe/full

@@ -1,0 +1,16 @@
+dataset:
+  name: zavod70
+  colmap_path: artifacts/colmap/zavod70
+  images_path: .
+  reconstruction_path: .
+
+training:
+  method: splatfacto
+  max_iterations: 30000
+  smoke_iterations: 3000
+  output_dir: artifacts/splatfacto
+  experiment_name: zavod70
+
+render:
+  camera_path: configs/camera_path.json
+  output: renders/zavod70-demo.mp4
