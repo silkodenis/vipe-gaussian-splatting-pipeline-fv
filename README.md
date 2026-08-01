@@ -168,17 +168,17 @@ the four placeholder values:
 
 ```bash
 LOCAL_ZIP="/path/to/zavod70-20260801T082255Z-1-001.zip"
-UBUNTU_USER="<user>"
-UBUNTU_IP="<ip>"
-UBUNTU_REPO="/path/to/vipe-gaussian-splatting-pipeline-fv"
+REMOTE_USER="<user>"
+REMOTE_HOST="<host-or-ip>"
+REMOTE_REPO="/path/to/vipe-gaussian-splatting-pipeline-fv"
 
 scp "${LOCAL_ZIP}" \
-  "${UBUNTU_USER}@${UBUNTU_IP}:/tmp/zavod70-dataset.zip"
+  "${REMOTE_USER}@${REMOTE_HOST}:/tmp/zavod70-dataset.zip"
 
-ssh "${UBUNTU_USER}@${UBUNTU_IP}" \
-  "mkdir -p '${UBUNTU_REPO}/data/input/zavod70' && \
+ssh "${REMOTE_USER}@${REMOTE_HOST}" \
+  "mkdir -p '${REMOTE_REPO}/data/input/zavod70' && \
    unzip -j -n /tmp/zavod70-dataset.zip '*.jpg' \
-     -d '${UBUNTU_REPO}/data/input/zavod70'"
+     -d '${REMOTE_REPO}/data/input/zavod70'"
 ```
 
 `unzip -j` discards the directory stored inside the ZIP, ensuring that the
@@ -432,7 +432,7 @@ For SSH access to the viewer, establish the tunnel from the client machine
 before `make view-splat-full`:
 
 ```bash
-ssh -L 7007:localhost:7007 user@ubuntu-host
+ssh -L 7007:localhost:7007 user@remote-host
 ```
 
 Apart from placing the source JPEGs in `data/input/zavod70/`, do not copy

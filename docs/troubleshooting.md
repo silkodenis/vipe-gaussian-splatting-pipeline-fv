@@ -169,11 +169,11 @@ the final config/checkpoint automatically, and return to the shell. Use
 
 ## Viewer is not reachable over SSH
 
-Forward the viewer port from macOS to Ubuntu. Use the port printed by
-Nerfstudio, for example:
+Forward the viewer port from the client machine to the remote GPU host. Use the
+port printed by Nerfstudio, for example:
 
 ```bash
-ssh -L 7007:localhost:7007 user@ubuntu-host
+ssh -L 7007:localhost:7007 user@remote-host
 ```
 
 Then open the local URL printed by the training process.
