@@ -428,10 +428,10 @@ make render-splat-full
 ```
 
 The target automatically selects the newest timestamped Viewer JSON and the
-validated full-model config. Before rendering, it creates a derived
-`*.project.json` and enforces the versioned crop and background settings from
-`configs/splatfacto.yaml`; the original Viewer JSON is preserved. The result is
-written to `renders/zavod70/<timestamp>.mp4`.
+validated full-model config, then renders that JSON unchanged. The timestamped
+Viewer JSON is the source of truth for keyframes, interpolated frames, crop,
+background, FOV, resolution, FPS, and duration. The result is written to
+`renders/zavod70/<timestamp>.mp4`.
 
 To render a specific older Viewer path instead of the newest one:
 

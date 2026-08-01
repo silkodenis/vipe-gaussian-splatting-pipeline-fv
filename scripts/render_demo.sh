@@ -30,7 +30,6 @@ mkdir -p "$(dirname -- "${output}")"
 conda_cuda_run "${NERFSTUDIO_ENV_NAME}" python "${SCRIPT_DIR}/render_camera_path.py" \
   --load-config "${load_config}" \
   --camera-path "${camera_path}" \
-  --output "${output}" \
-  --settings "${PROJECT_ROOT}/configs/splatfacto.yaml"
+  --output "${output}"
 
 echo "Demo video: ${output}"

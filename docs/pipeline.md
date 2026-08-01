@@ -146,7 +146,7 @@ Prefer a slow trajectory near the original capture manifold; aggressive moves
 into unseen space will expose holes and extrapolation artifacts. Edit the
 preloaded spline as needed, click the Viewer's `Generate Command` to save it,
 and run `make render-splat-full`. The render target selects the newest
-timestamped path automatically and enforces the versioned crop settings.
+timestamped path automatically and renders its saved settings unchanged.
 
 ## Execution records
 
