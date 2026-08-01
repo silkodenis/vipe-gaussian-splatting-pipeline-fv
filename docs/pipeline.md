@@ -14,6 +14,10 @@ native libraries, and `uv`; `uv sync --frozen` creates `.cache/vipe/.venv`
 from the release's committed `uv.lock`. Project commands therefore run through
 both `conda run` and `uv run`.
 
+This installation path is verified on the target RTX 4050 Laptop host. The
+recorded runtime is Python 3.10.20, PyTorch 2.9.0+cu128, NVCC 12.8.61, and the
+Conda GCC 14.4.0 host compiler; `torch.cuda.is_available()` returns `True`.
+
 ## Dataset contract
 
 The input is a ZIP containing DJI JPEG files named with a four-digit frame

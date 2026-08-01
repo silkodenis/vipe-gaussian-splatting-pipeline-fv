@@ -79,6 +79,24 @@ Python or CUDA dependencies manually.
 This host passed `scripts/check_environment.sh gpu`. The 6 GiB VRAM budget is
 tight, so every GPU stage starts with a reduced-resolution smoke run.
 
+The pinned ViPE installation has also been verified end-to-end on this host:
+
+| Runtime component | Verified value |
+| --- | --- |
+| ViPE | 1.2.0, commit `95a8816947602ddc26fcb7a80bea4f9313059578` |
+| Python | 3.10.20, managed by uv |
+| PyTorch | 2.9.0+cu128 |
+| CUDA visible to PyTorch | 12.8, available |
+| NVCC | 12.8.61 |
+| Conda host compiler | GCC 14.4.0 |
+| uv | 0.12.1 |
+
+The successful validation command is:
+
+```bash
+make diagnose-vipe
+```
+
 ## Mac-to-Ubuntu workflow
 
 Code and documentation are edited and committed on macOS. GPU commands run on
