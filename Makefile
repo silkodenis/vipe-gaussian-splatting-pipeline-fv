@@ -2,12 +2,12 @@ SHELL := /usr/bin/env bash
 
 -include .env
 
-DATASET_ARCHIVE ?= zavod70-20260801T082255Z-1-001.zip
+DATASET_INPUT_DIR ?= data/input/zavod70
 DATASET_NAME ?= zavod70
 PREPARED_WIDTH ?= 1280
 CAPTURE_FPS ?= 1
 SMOKE_FRAMES ?= 20
-EXPECTED_ARCHIVE_SHA256 ?= d17b0a89fcb59ea22e5d89de95beb9a36eb42a6119620b4959b35763bbece1c0
+EXPECTED_CONTENT_SHA256 ?= e8f7dbe4ae97d225ef9b6daa1ff742e69459a8941f6bf6a546e0a1da2456ac9e
 EXPECTED_FRAME_COUNT ?= 126
 EXPECTED_FIRST_FRAME ?= 1
 EXPECTED_LAST_FRAME ?= 126
@@ -22,12 +22,12 @@ check:
 	./scripts/check_environment.sh gpu
 
 inspect:
-	python3 ./scripts/prepare_dataset.py "$(DATASET_ARCHIVE)" \
+	python3 ./scripts/prepare_dataset.py "$(DATASET_INPUT_DIR)" \
 		--dataset-name "$(DATASET_NAME)" \
 		--width "$(PREPARED_WIDTH)" \
 		--fps "$(CAPTURE_FPS)" \
 		--smoke-frames "$(SMOKE_FRAMES)" \
-		--expected-sha256 "$(EXPECTED_ARCHIVE_SHA256)" \
+		--expected-content-sha256 "$(EXPECTED_CONTENT_SHA256)" \
 		--expected-frame-count "$(EXPECTED_FRAME_COUNT)" \
 		--expected-first-frame "$(EXPECTED_FIRST_FRAME)" \
 		--expected-last-frame "$(EXPECTED_LAST_FRAME)" \
@@ -35,12 +35,12 @@ inspect:
 		--inspect-only
 
 prepare:
-	python3 ./scripts/prepare_dataset.py "$(DATASET_ARCHIVE)" \
+	python3 ./scripts/prepare_dataset.py "$(DATASET_INPUT_DIR)" \
 		--dataset-name "$(DATASET_NAME)" \
 		--width "$(PREPARED_WIDTH)" \
 		--fps "$(CAPTURE_FPS)" \
 		--smoke-frames "$(SMOKE_FRAMES)" \
-		--expected-sha256 "$(EXPECTED_ARCHIVE_SHA256)" \
+		--expected-content-sha256 "$(EXPECTED_CONTENT_SHA256)" \
 		--expected-frame-count "$(EXPECTED_FRAME_COUNT)" \
 		--expected-first-frame "$(EXPECTED_FIRST_FRAME)" \
 		--expected-last-frame "$(EXPECTED_LAST_FRAME)" \

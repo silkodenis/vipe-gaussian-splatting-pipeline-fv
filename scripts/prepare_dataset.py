@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the DJI archive, extract normalized frames, and create ViPE MP4 inputs."""
+"""Validate a local DJI image directory and create normalized ViPE inputs."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ import re
 import shutil
 import subprocess
 import sys
-import zipfile
 from datetime import datetime, timezone
 from fractions import Fraction
 from pathlib import Path
@@ -22,13 +21,13 @@ FRAME_PATTERN = re.compile(r"_(\d{4})_v\.jpg$", re.IGNORECASE)
 def parse_args() -> argparse.Namespace:
     project_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("archive", type=Path, help="Google Drive ZIP archive")
+    parser.add_argument("input_dir", type=Path, help="Directory containing the DJI JPEG frames")
     parser.add_argument("--project-root", type=Path, default=project_root)
     parser.add_argument("--dataset-name", default="zavod70")
     parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--fps", type=float, default=1.0)
     parser.add_argument("--smoke-frames", type=int, default=20)
-    parser.add_argument("--expected-sha256")
+    parser.add_argument("--expected-content-sha256")
     parser.add_argument("--expected-frame-count", type=int)
     parser.add_argument("--expected-first-frame", type=int)
     parser.add_argument("--expected-last-frame", type=int)
@@ -36,14 +35,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--inspect-only",
         action="store_true",
-        help="Validate and summarize the archive without extracting it",
+        help="Validate and summarize the image directory without preparing it",
     )
     return parser.parse_args()
 
 
 def validate_expected_dataset(summary: dict[str, object], args: argparse.Namespace) -> None:
     expected = {
-        "archive_sha256": args.expected_sha256,
+        "content_sha256": args.expected_content_sha256,
         "frame_count": args.expected_frame_count,
         "first_frame_index": args.expected_first_frame,
         "last_frame_index": args.expected_last_frame,
@@ -58,34 +57,45 @@ def validate_expected_dataset(summary: dict[str, object], args: argparse.Namespa
         raise ValueError("Dataset identity mismatch; " + "; ".join(mismatches))
 
 
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def collect_frames(archive: zipfile.ZipFile) -> list[tuple[int, zipfile.ZipInfo]]:
-    frames: list[tuple[int, zipfile.ZipInfo]] = []
-    for member in archive.infolist():
-        if member.is_dir():
+def collect_frames(input_dir: Path) -> list[tuple[int, Path]]:
+    frames: list[tuple[int, Path]] = []
+    for path in input_dir.iterdir():
+        if path.name == ".gitkeep":
             continue
-        match = FRAME_PATTERN.search(member.filename)
+        if not path.is_file():
+            raise ValueError(f"Unexpected entry in dataset directory: {path.name}")
+        match = FRAME_PATTERN.search(path.name)
         if match is None:
-            raise ValueError(f"Unexpected archive member: {member.filename}")
-        frames.append((int(match.group(1)), member))
+            raise ValueError(f"Unexpected dataset file: {path.name}")
+        frames.append((int(match.group(1)), path))
 
     frames.sort(key=lambda item: item[0])
     if not frames:
-        raise ValueError("The archive contains no DJI JPEG frames")
+        raise ValueError(f"No DJI JPEG frames found in {input_dir}")
 
     indices = [index for index, _ in frames]
+    if len(indices) != len(set(indices)):
+        raise ValueError("Dataset contains duplicate frame indices")
     expected = list(range(indices[0], indices[-1] + 1))
     if indices != expected:
         missing = sorted(set(expected) - set(indices))
         raise ValueError(f"Frame sequence is not contiguous; missing: {missing}")
     return frames
+
+
+def frame_content_sha256(frames: list[tuple[int, Path]]) -> tuple[str, dict[int, str]]:
+    """Hash ordered content and each JPEG in one pass over the source data."""
+    digest = hashlib.sha256()
+    frame_hashes: dict[int, str] = {}
+    for index, path in frames:
+        digest.update(index.to_bytes(4, byteorder="big", signed=False))
+        frame_digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                digest.update(chunk)
+                frame_digest.update(chunk)
+        frame_hashes[index] = frame_digest.hexdigest()
+    return digest.hexdigest(), frame_hashes
 
 
 def run_ffmpeg(
@@ -164,11 +174,11 @@ def validate_video(output: Path, expected_width: int, expected_fps: float, expec
 
 def main() -> int:
     args = parse_args()
-    archive_path = args.archive.expanduser().resolve()
+    input_dir = args.input_dir.expanduser().resolve()
     project_root = args.project_root.expanduser().resolve()
 
-    if not archive_path.is_file():
-        raise FileNotFoundError(archive_path)
+    if not input_dir.is_dir():
+        raise FileNotFoundError(input_dir)
     if args.width <= 0 or args.width % 2:
         raise ValueError("--width must be a positive even number")
     if args.fps <= 0:
@@ -176,50 +186,46 @@ def main() -> int:
     if args.smoke_frames <= 0:
         raise ValueError("--smoke-frames must be positive")
 
-    with zipfile.ZipFile(archive_path) as archive:
-        bad_member = archive.testzip()
-        if bad_member is not None:
-            raise ValueError(f"Corrupt ZIP member: {bad_member}")
-        frames = collect_frames(archive)
-        total_bytes = sum(member.file_size for _, member in frames)
-        summary = {
-            "archive": archive_path.name,
-            "archive_sha256": sha256(archive_path),
-            "dataset": args.dataset_name,
-            "frame_count": len(frames),
-            "first_frame_index": frames[0][0],
-            "last_frame_index": frames[-1][0],
-            "uncompressed_bytes": total_bytes,
-            "prepared_width": args.width,
-            "capture_fps": args.fps,
-        }
+    frames = collect_frames(input_dir)
+    total_bytes = sum(path.stat().st_size for _, path in frames)
+    content_hash, frame_hashes = frame_content_sha256(frames)
+    summary = {
+        "input_directory": str(input_dir),
+        "content_sha256": content_hash,
+        "dataset": args.dataset_name,
+        "frame_count": len(frames),
+        "first_frame_index": frames[0][0],
+        "last_frame_index": frames[-1][0],
+        "uncompressed_bytes": total_bytes,
+        "prepared_width": args.width,
+        "capture_fps": args.fps,
+    }
 
-        print(json.dumps(summary, indent=2))
-        validate_expected_dataset(summary, args)
-        if args.inspect_only:
-            return 0
+    print(json.dumps(summary, indent=2))
+    validate_expected_dataset(summary, args)
+    if args.inspect_only:
+        return 0
 
-        images_dir = project_root / "data" / "raw" / args.dataset_name / "images"
-        if images_dir.exists() and any(images_dir.iterdir()):
-            raise FileExistsError(
-                f"Refusing to overwrite non-empty directory: {images_dir}. Remove it explicitly to rebuild."
-            )
-        images_dir.mkdir(parents=True, exist_ok=True)
+    images_dir = project_root / "data" / "raw" / args.dataset_name / "images"
+    if images_dir.exists() and any(images_dir.iterdir()):
+        raise FileExistsError(
+            f"Refusing to overwrite non-empty directory: {images_dir}. Remove it explicitly to rebuild."
+        )
+    images_dir.mkdir(parents=True, exist_ok=True)
 
-        manifest_frames = []
-        for index, member in frames:
-            destination = images_dir / f"frame_{index:04d}.jpg"
-            with archive.open(member) as source, destination.open("wb") as target:
-                shutil.copyfileobj(source, target, length=8 * 1024 * 1024)
-            manifest_frames.append(
-                {
-                    "index": index,
-                    "source_name": member.filename,
-                    "prepared_name": destination.name,
-                    "bytes": member.file_size,
-                    "crc32": f"{member.CRC:08x}",
-                }
-            )
+    manifest_frames = []
+    for index, source in frames:
+        destination = images_dir / f"frame_{index:04d}.jpg"
+        shutil.copyfile(source, destination)
+        manifest_frames.append(
+            {
+                "index": index,
+                "source_name": source.name,
+                "prepared_name": destination.name,
+                "bytes": source.stat().st_size,
+                "sha256": frame_hashes[index],
+            }
+        )
 
     manifest = {
         **summary,
@@ -233,22 +239,8 @@ def main() -> int:
     smoke_frames = min(args.smoke_frames, len(frames))
     smoke_video = interim_dir / f"{args.dataset_name}-smoke.mp4"
     full_video = interim_dir / f"{args.dataset_name}.mp4"
-    run_ffmpeg(
-        images_dir,
-        smoke_video,
-        frames[0][0],
-        args.fps,
-        args.width,
-        smoke_frames,
-    )
-    run_ffmpeg(
-        images_dir,
-        full_video,
-        frames[0][0],
-        args.fps,
-        args.width,
-        None,
-    )
+    run_ffmpeg(images_dir, smoke_video, frames[0][0], args.fps, args.width, smoke_frames)
+    run_ffmpeg(images_dir, full_video, frames[0][0], args.fps, args.width, None)
     videos = [
         validate_video(smoke_video, args.width, args.fps, smoke_frames),
         validate_video(full_video, args.width, args.fps, len(frames)),
@@ -261,6 +253,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (FileNotFoundError, FileExistsError, RuntimeError, ValueError, zipfile.BadZipFile) as error:
+    except (FileNotFoundError, FileExistsError, RuntimeError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
         raise SystemExit(1) from error

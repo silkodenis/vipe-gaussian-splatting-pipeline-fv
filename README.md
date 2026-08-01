@@ -11,7 +11,7 @@ video.
 ## Pipeline
 
 ```text
-DJI JPEG archive
+DJI JPEG directory
   -> validated 1 FPS MP4
   -> ViPE camera poses and SLAM map
   -> COLMAP cameras, images, and point cloud
@@ -144,28 +144,27 @@ cd /path/to/vipe-gaussian-splatting-pipeline-fv
 git pull --ff-only
 ```
 
-## Dataset archive
+## Dataset directory
 
-The dataset is distributed separately and must not be committed to Git. Obtain
-the authorized archive from the dataset provider and place it in the repository
-root with this exact default name:
+The dataset is distributed separately and must not be committed to Git. After
+obtaining the `zavod70` dataset through the authorized channel, place its JPEG
+images directly in the repository's existing input directory:
 
 ```text
-zavod70-20260801T082255Z-1-001.zip
+data/input/zavod70/
+├── dji_20250111171148_0001_v.jpg
+├── dji_20250111171149_0002_v.jpg
+├── ...
+└── dji_20250111171353_0126_v.jpg
 ```
 
-For example, copy it from the development machine to the Ubuntu host:
+Do not add another nested `zavod70` directory. The images must be immediate
+children of `data/input/zavod70/`. Their contents are ignored by Git; only the
+hidden `.gitkeep` placeholder is versioned.
+
+Then verify and prepare the sequence from the repository root:
 
 ```bash
-scp zavod70-20260801T082255Z-1-001.zip \
-  user@ubuntu-host:/path/to/vipe-gaussian-splatting-pipeline-fv/
-```
-
-Then verify and prepare it from the repository root:
-
-```bash
-test -f zavod70-20260801T082255Z-1-001.zip
-sha256sum zavod70-20260801T082255Z-1-001.zip
 make inspect
 make prepare
 ```
@@ -174,14 +173,15 @@ Expected source identity:
 
 | Property | Expected value |
 | --- | --- |
-| SHA-256 | `d17b0a89fcb59ea22e5d89de95beb9a36eb42a6119620b4959b35763bbece1c0` |
+| Ordered JPEG content SHA-256 | `e8f7dbe4ae97d225ef9b6daa1ff742e69459a8941f6bf6a546e0a1da2456ac9e` |
 | Files | 126 contiguous JPEG frames, indices 1 through 126 |
 | Uncompressed bytes | 1,074,302,976 |
 
-Do not continue if the checksum or frame range differs. To intentionally use
-another authorized archive, copy `.env.example` to `.env` and update
-`DATASET_ARCHIVE` together with all five `EXPECTED_*` identity fields; document
-its checksum and provenance in the final report.
+The content checksum covers the ordered frame indices and all JPEG bytes. Do
+not continue if it or the frame range differs. To intentionally use another
+authorized sequence, copy `.env.example` to `.env` and update
+`DATASET_INPUT_DIR` together with all five `EXPECTED_*` identity fields;
+document its checksum and provenance in the final report.
 
 The verified preparation result on Ubuntu is:
 
@@ -190,10 +190,10 @@ The verified preparation result on Ubuntu is:
 | `data/interim/zavod70-smoke.mp4` | 1280×960 | 1 | 20 |
 | `data/interim/zavod70.mp4` | 1280×960 | 1 | 126 |
 
-The source ZIP, extracted JPEGs, manifest, and MP4 files remain local and are
-covered by `.gitignore`. Both `make inspect` and `make prepare` enforce the
-checksum, frame count and range, and uncompressed byte count shown above; a
-different archive fails before any GPU stage starts.
+The input JPEGs, normalized copies, manifest, and MP4 files remain local and
+are covered by `.gitignore`. Both `make inspect` and `make prepare` enforce the
+content checksum, frame count and range, and byte count shown above; a
+different sequence fails before any GPU stage starts.
 
 ## Quick start on Ubuntu
 
@@ -216,7 +216,7 @@ make inspect
 make prepare
 ```
 
-Preparation verifies the complete ZIP, checks that frame indices are
+Preparation verifies the complete directory, checks that frame indices are
 contiguous, preserves the source JPEG bytes, records a manifest, and creates:
 
 ```text
@@ -381,7 +381,8 @@ The result is written to `renders/zavod70-demo.mp4`.
 ## Clean-room acceptance sequence
 
 Run this from a new directory on Ubuntu to test the repository exactly as a
-reviewer would. The dataset ZIP is the only file supplied outside Git:
+reviewer would. The `zavod70` JPEG sequence is the only input supplied outside
+Git:
 
 ```bash
 git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
@@ -390,7 +391,7 @@ cd vipe-gaussian-splatting-pipeline-fv
 ./scripts/bootstrap_ubuntu.sh
 make check
 
-# Copy zavod70-20260801T082255Z-1-001.zip into this directory first.
+# Place the 126 JPEGs directly under data/input/zavod70/ first.
 make inspect
 make prepare
 
@@ -410,10 +411,10 @@ before `make view-splat-full`:
 ssh -L 7007:localhost:7007 user@ubuntu-host
 ```
 
-Do not copy `.cache`, `data`, or `artifacts` from an earlier checkout during
-this test. Their absence is what proves that dependency installation, dataset
-preparation, and all pipeline stages are reproducible from the documented
-inputs.
+Apart from placing the source JPEGs in `data/input/zavod70/`, do not copy
+`.cache`, `data/raw`, `data/interim`, or `artifacts` from an earlier checkout.
+Their absence is what proves that dependency installation, preprocessing, and
+all pipeline stages are reproducible from the documented inputs.
 
 ## Repository layout
 

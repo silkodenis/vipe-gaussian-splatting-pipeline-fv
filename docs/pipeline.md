@@ -31,16 +31,18 @@ the newer 2.x API. The Conda CUDA driver stub directory is added to
 
 ## Dataset contract
 
-The input is a ZIP containing DJI JPEG files named with a four-digit frame
-index. `prepare_dataset.py` requires one contiguous sequence and deliberately
-rejects unexpected files. It writes normalized filenames without modifying
-the JPEG payload, so EXIF/XMP remains available for diagnostics.
+The input is `data/input/zavod70/`, containing DJI JPEG files named with a
+four-digit frame index. `prepare_dataset.py` requires the images to be direct
+children of that directory, requires one contiguous sequence, and deliberately
+rejects nested directories or unexpected files. It writes normalized filenames
+without modifying the JPEG payload, so EXIF/XMP remains available for
+diagnostics.
 
-The default Make targets additionally enforce the authorized archive's exact
-SHA-256, frame count, first/last indices, and total uncompressed byte count.
-Both inspection and extraction fail on an identity mismatch. Alternative data
+The default Make targets enforce a SHA-256 over the ordered frame indices and
+JPEG bytes, plus the frame count, first/last indices, and total byte count.
+Both inspection and preparation fail on an identity mismatch. Alternative data
 therefore requires an explicit, documented update of all `EXPECTED_*` values
-in the local `.env`; changing only the filename is insufficient.
+in the local `.env`; changing only the directory is insufficient.
 
 Prepared video parameters:
 

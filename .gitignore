@@ -1,4 +1,6 @@
 # Local datasets and downloaded archives
+/data/input/zavod70/*
+!/data/input/zavod70/.gitkeep
 /data/raw/
 /data/interim/
 /data/processed/
