@@ -18,6 +18,12 @@ This installation path is verified on the target RTX 4050 Laptop host. The
 recorded runtime is Python 3.10.20, PyTorch 2.9.0+cu128, NVCC 12.8.61, and the
 Conda GCC 14.4.0 host compiler; `torch.cuda.is_available()` returns `True`.
 
+The separate Nerfstudio environment follows its v1.1.5 CUDA 11.8 installation
+path. Project pins additionally constrain NumPy to 1.26.4 for PyTorch 2.1.2
+and Setuptools to 80.9.0 because the pinned `tiny-cuda-nn` setup imports
+`pkg_resources`, removed from Setuptools 82. `tiny-cuda-nn` is built from an
+exact commit without build isolation, targeting only compute capability 8.9.
+
 ## Dataset contract
 
 The input is a ZIP containing DJI JPEG files named with a four-digit frame

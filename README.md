@@ -226,10 +226,18 @@ dependencies. Both setup commands are safe to rerun. They install
 Conda-managed host compilers as well: GCC 14 for CUDA 12.8 and GCC 11 for CUDA
 11.8, avoiding dependence on the host distribution's compiler.
 
-Verify ViPE after installation with:
+The Nerfstudio environment also pins PyTorch 2.1.2+cu118, NumPy 1.26.4,
+Setuptools 80.9.0, and the exact `tiny-cuda-nn` source commit. The Setuptools
+pin is required because `tiny-cuda-nn` imports the legacy `pkg_resources`
+module, which was removed in Setuptools 82. Its CUDA extension is built without
+an isolated temporary environment, for compute capability 8.9 and with two
+parallel compiler jobs. No package needs to be installed manually.
+
+Verify both environments after installation with:
 
 ```bash
 make diagnose-vipe
+make diagnose-splatfacto
 ```
 
 ### 4. Run the smoke pipeline

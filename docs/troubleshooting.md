@@ -38,6 +38,23 @@ compiler, uv, PyTorch, CUDA runtime visibility, and the ViPE CLI status.
 
 Do not install ViPE into the Nerfstudio environment.
 
+## `tiny-cuda-nn` cannot import `pkg_resources`
+
+Setuptools removed `pkg_resources` in version 82, while the pinned
+`tiny-cuda-nn` build script still imports it. Do not install packages by hand
+and do not delete the partially created Conda environment. Pull the current
+project revision and rerun:
+
+```bash
+make setup-splatfacto
+make diagnose-splatfacto
+```
+
+The idempotent setup pins Setuptools 80.9.0 after the Conda CUDA transaction,
+verifies the import, and builds the exact `tiny-cuda-nn` commit with
+`--no-build-isolation`. `ns-train: No such file or directory` after this error
+only means setup stopped before Nerfstudio itself was installed.
+
 ## `envs/base.yml` is missing
 
 ViPE v1.2.0 uses `envs/cu128.yml`; `base.yml` belongs to a different repository
