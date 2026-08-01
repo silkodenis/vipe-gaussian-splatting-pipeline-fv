@@ -1,6 +1,12 @@
 SHELL := /usr/bin/env bash
 
-ARCHIVE ?= zavod70-20260801T082255Z-1-001.zip
+-include .env
+
+DATASET_ARCHIVE ?= zavod70-20260801T082255Z-1-001.zip
+DATASET_NAME ?= zavod70
+PREPARED_WIDTH ?= 1280
+CAPTURE_FPS ?= 1
+SMOKE_FRAMES ?= 20
 
 .PHONY: bootstrap check inspect prepare setup-vipe setup-splatfacto vipe-smoke vipe-full colmap-smoke colmap-full splat-smoke splat-full
 
@@ -11,10 +17,19 @@ check:
 	./scripts/check_environment.sh gpu
 
 inspect:
-	python3 ./scripts/prepare_dataset.py "$(ARCHIVE)" --inspect-only
+	python3 ./scripts/prepare_dataset.py "$(DATASET_ARCHIVE)" \
+		--dataset-name "$(DATASET_NAME)" \
+		--width "$(PREPARED_WIDTH)" \
+		--fps "$(CAPTURE_FPS)" \
+		--smoke-frames "$(SMOKE_FRAMES)" \
+		--inspect-only
 
 prepare:
-	python3 ./scripts/prepare_dataset.py "$(ARCHIVE)"
+	python3 ./scripts/prepare_dataset.py "$(DATASET_ARCHIVE)" \
+		--dataset-name "$(DATASET_NAME)" \
+		--width "$(PREPARED_WIDTH)" \
+		--fps "$(CAPTURE_FPS)" \
+		--smoke-frames "$(SMOKE_FRAMES)"
 
 setup-vipe:
 	./scripts/setup_vipe.sh

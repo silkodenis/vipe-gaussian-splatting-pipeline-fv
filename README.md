@@ -43,8 +43,40 @@ Pinned versions live in [`configs/versions.env`](configs/versions.env).
 - `sudo` access for the one-time bootstrap
 - At least 20 GB of free disk space for environments and generated artifacts
 
-The target laptop has an RTX 4070 with limited VRAM, so the initial pipeline
-uses 1600 px frames and ViPE's `no_vda` configuration.
+The verified target laptop has an RTX 4050 Laptop GPU with 6141 MiB VRAM, so
+the initial pipeline uses 1280 px frames and ViPE's `no_vda` configuration.
+
+## Fresh Ubuntu checkout
+
+These are the only commands required before dataset preparation:
+
+```bash
+git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
+cd vipe-gaussian-splatting-pipeline-fv
+./scripts/bootstrap_ubuntu.sh
+./scripts/check_environment.sh gpu
+```
+
+The bootstrap may request the user's `sudo` password for APT. It installs all
+declared host packages and the project-local Conda distribution; do not install
+Python or CUDA dependencies manually.
+
+## Verified Ubuntu host
+
+| Component | Detected value |
+| --- | --- |
+| OS | Ubuntu 26.04 LTS, Linux 7.0.0 x86_64 |
+| GPU | NVIDIA GeForce RTX 4050 Laptop GPU |
+| VRAM | 6141 MiB |
+| Compute capability | 8.9 |
+| NVIDIA driver | 595.71.05 |
+| RAM / swap | 14 GiB / 4 GiB |
+| FFmpeg | 8.0.1 |
+| Conda | 26.3.2 (Miniforge) |
+| System compiler | GCC 15.2.0 |
+
+This host passed `scripts/check_environment.sh gpu`. The 6 GiB VRAM budget is
+tight, so every GPU stage starts with a reduced-resolution smoke run.
 
 ## Mac-to-Ubuntu workflow
 
@@ -97,7 +129,10 @@ data/interim/zavod70.mp4        # all 126 frames
 ```
 
 Both videos use 1 FPS to preserve the capture timing and are resized to
-1600 px width.
+1280 px width.
+
+To override defaults, copy `.env.example` to `.env` and edit the values before
+running `make`. The local `.env` file is ignored by Git.
 
 ### 3. Install pinned GPU environments
 

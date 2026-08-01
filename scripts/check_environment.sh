@@ -19,6 +19,9 @@ if [[ -f /etc/os-release ]]; then
   # shellcheck disable=SC1091
   source /etc/os-release
   echo "OS:      ${PRETTY_NAME}"
+  if [[ "${ID:-}" == "ubuntu" && "${VERSION_ID:-0}" != "24.04" && "${VERSION_ID:-0}" != "22.04" && "${VERSION_ID:-0}" != "20.04" ]]; then
+    echo "Warning: Ubuntu ${VERSION_ID:-unknown} is outside the CUDA 12.8 qualified Ubuntu releases." >&2
+  fi
 else
   echo "OS:      $(uname -s)"
 fi

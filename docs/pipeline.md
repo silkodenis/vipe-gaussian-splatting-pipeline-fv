@@ -19,7 +19,7 @@ the JPEG payload, so EXIF/XMP remains available for diagnostics.
 Prepared video parameters:
 
 - 1 FPS, matching the source capture interval
-- 1600 px width with preserved aspect ratio
+- 1280 px width with preserved aspect ratio
 - H.264, CRF 18, YUV 4:2:0
 - 20-frame smoke video and a full 126-frame video
 

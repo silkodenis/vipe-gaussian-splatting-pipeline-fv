@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("archive", type=Path, help="Google Drive ZIP archive")
     parser.add_argument("--project-root", type=Path, default=project_root)
     parser.add_argument("--dataset-name", default="zavod70")
-    parser.add_argument("--width", type=int, default=1600)
+    parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--fps", type=float, default=1.0)
     parser.add_argument("--smoke-frames", type=int, default=20)
     parser.add_argument(

@@ -44,7 +44,7 @@ Do not install ViPE into the Nerfstudio environment.
 
 1. Confirm that no other process is using the GPU with `nvidia-smi`.
 2. Keep the `no_vda` pipeline.
-3. Re-run dataset preparation with a smaller even width, for example 1280.
+3. Re-run dataset preparation with a smaller even width, for example 960.
 4. Validate on the 20-frame smoke video before retrying the full sequence.
 
 ## Camera tracking is fragmented
