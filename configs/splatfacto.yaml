@@ -30,4 +30,4 @@ render:
       center: [0.0, 0.0, 0.0]
       scale: [2.5, 1.94, 1.0]
       rotation: [0.0, 0.0, 0.0]
-      background_rgb: [36, 36, 36]
+      background_rgb: [8, 8, 8]
