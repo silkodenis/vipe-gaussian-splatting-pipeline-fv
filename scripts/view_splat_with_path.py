@@ -43,7 +43,7 @@ def install_path_loader(camera_path_file: Path) -> None:
         camera_path = created_paths.pop()
         camera_path.reset()
         camera_path.default_fov = np.deg2rad(payload.get("default_fov", 75.0))
-        camera_path.default_transition_sec = float(payload.get("default_transition_sec", 0.1))
+        camera_path.default_transition_sec = float(payload.get("default_transition_sec", 1.0))
         camera_path.framerate = float(payload.get("fps", 30.0))
         camera_path.loop = bool(payload.get("is_cycle", False))
         camera_path.tension = float(payload.get("smoothness_value", 0.0))

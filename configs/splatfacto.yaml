@@ -22,7 +22,7 @@ render:
   output: renders/zavod70-demo.mp4
   dataset_path:
     keyframe_stride: 1
-    transition_seconds: 0.1
+    transition_seconds: 1.0
     fps: 30
     resolution: [1280, 960]
     crop:

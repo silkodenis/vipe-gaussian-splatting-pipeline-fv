@@ -138,6 +138,8 @@ training/evaluation interval split. It converts them to editable Viewer
 keyframes and preloads the path without modifying the installed Nerfstudio
 package. The configured crop is applied to the interactive viewport and is
 written into the final JSON by the Viewer's `Generate Command` action.
+The default one-second transition matches the timestamp interval in every
+source filename, producing a 125-second path from the 126 recovered cameras.
 
 Prefer a slow trajectory near the original capture manifold; aggressive moves
 into unseen space will expose holes and extrapolation artifacts. Edit the

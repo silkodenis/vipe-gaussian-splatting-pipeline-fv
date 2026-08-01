@@ -411,6 +411,11 @@ Viewer launch:
 artifacts/colmap/full/zavod70/camera_paths/ordered-dataset-cameras.json
 ```
 
+The source filenames span `17:11:48` through `17:13:53` with an exact
+one-second interval between all 126 frames. Accordingly, the default path uses
+a one-second transition and lasts 125 seconds, preserving the real capture
+timing.
+
 In the Viewer, open `RENDER`, play the preloaded spline, remove or move
 keyframes if desired, and adjust transition time, spline tension, FOV,
 resolution, and crop. `Generate Command` saves the edited path under the same
