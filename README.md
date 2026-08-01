@@ -233,7 +233,11 @@ only if every override is valid.
 The default `VIPE_PROFILE=low-vram` is designed for the verified RTX 4050. It
 disables SAM/AOT/GroundingDINO instance masks and async prefetch, uses ViPE's
 smaller `metric3d-small` keyframe prior to recover scale, skips dense depth
-post-processing, and saves the 3D-consistent SLAM map used by the next stage.
+post-processing, reduces the dense-infill chunk to four frames, sizes the GPU
+SLAM buffer from the probed video frame count, and saves the 3D-consistent SLAM
+map used by the next stage. The allocation is `2 × frames + 16` slots: 56 for
+the 20-frame smoke video and 268 for the 126-frame full video. This safely
+covers both ViPE passes without its memory-heavy 1024-slot default.
 This is intentional: ViPE's `no_vda` preset still loads `UniDepth-L`, which
 runs out of memory while loading on this GPU before the first frame.
 

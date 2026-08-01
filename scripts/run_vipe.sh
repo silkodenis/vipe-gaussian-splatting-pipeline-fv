@@ -13,6 +13,7 @@ if [[ "${mode}" != "smoke" && "${mode}" != "full" ]]; then
 fi
 
 require_conda
+require_command ffprobe
 dataset_name="${DATASET_NAME:-zavod70}"
 vipe_profile="${VIPE_PROFILE:-low-vram}"
 vipe_dir="${PROJECT_ROOT}/.cache/vipe"
@@ -35,6 +36,23 @@ if [[ ! -f "${video}" ]]; then
 fi
 mkdir -p "${output}"
 
+frame_count="$({ ffprobe \
+  -v error \
+  -count_frames \
+  -select_streams v:0 \
+  -show_entries stream=nb_read_frames \
+  -of default=nokey=1:noprint_wrappers=1 \
+  "${video}"; } | tr -d '[:space:]')"
+if [[ ! "${frame_count}" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Could not determine a positive frame count for ${video}: ${frame_count}" >&2
+  exit 1
+fi
+
+# ViPE stores up to N accepted frames in pass 1, then appends all N frames in
+# pass 2. Its upstream default of 1024 slots consumes about 3.4 GiB at the
+# internal 384x512 SLAM resolution. Bound the allocation to this video instead.
+slam_buffer_size=$((frame_count * 2 + 16))
+
 vipe_args=(
   pipeline=no_vda
   streams=raw_mp4_stream
@@ -42,6 +60,7 @@ vipe_args=(
   streams.frame_start=0
   streams.frame_end=1000
   streams.frame_skip=1
+  "pipeline.slam.buffer=${slam_buffer_size}"
   "pipeline.output.path=${output}"
   pipeline.output.save_artifacts=true
   pipeline.output.save_slam_map=true
@@ -56,6 +75,7 @@ case "${vipe_profile}" in
       pipeline.init.async_prefetch=false
       pipeline.init.prefetch_queue_size=1
       pipeline.slam.keyframe_depth=metric3d-small
+      pipeline.slam.infill_chunk_size=4
       pipeline.post.depth_align_model=null
       pipeline.output.save_viz=false
     )
@@ -68,6 +88,7 @@ case "${vipe_profile}" in
       pipeline.init.async_prefetch=false
       pipeline.init.prefetch_queue_size=1
       pipeline.slam.keyframe_depth=null
+      pipeline.slam.infill_chunk_size=4
       pipeline.post.depth_align_model=null
       pipeline.output.save_viz=false
     )
@@ -89,6 +110,7 @@ conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py \
 mv "${config_tmp}" "${config_path}"
 echo "ViPE Hydra preflight: OK"
 echo "ViPE profile: ${vipe_profile}"
+echo "ViPE SLAM buffer: ${slam_buffer_size} slots for ${frame_count} input frames"
 conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py "${vipe_args[@]}"
 popd >/dev/null
 

@@ -56,7 +56,9 @@ rerun `make setup-vipe`. The existing pinned checkout is reused.
 
 3. Retry the smoke run with `make vipe-smoke`. The default `low-vram` profile
    avoids the model-loading OOM caused by keeping SAM, AOT, GroundingDINO and
-   `UniDepth-L` resident together.
+   `UniDepth-L` resident together. It also prints
+   `ViPE SLAM buffer: 56 slots for 20 input frames`; if it reports 1024, the
+   checkout is stale.
 4. If loading `metric3d-small` still fails, run
    `VIPE_PROFILE=pose-only make vipe-smoke`. This removes metric scale recovery;
    relative geometry remains usable by COLMAP and Splatfacto.
@@ -64,9 +66,11 @@ rerun `make setup-vipe`. The existing pinned checkout is reused.
    not solve an OOM raised by `self.model.cuda()` while weights are loading.
 
 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is not the fix for the
-observed log: only 17 MiB was free and the allocation failed while loading
-model weights, so the problem was total resident model size, not meaningful
-allocator fragmentation.
+first observed log: only 17 MiB was free and the allocation failed while
+loading model weights. A later run reached frame 13 with `metric3d-small` but
+still used ViPE's 1024-slot SLAM buffer. The project now derives that buffer
+from the video length, removing several GiB of unused preallocation rather
+than depending on allocator tuning.
 
 ## Hydra rejects `pipeline.init.kf_gap_sec`
 

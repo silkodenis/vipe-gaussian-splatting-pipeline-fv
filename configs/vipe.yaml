@@ -11,6 +11,8 @@ pipeline:
     async_prefetch: false
     prefetch_queue_size: 1
   slam:
+    buffer: auto  # 2 * probed video frame count + 16
+    infill_chunk_size: 4
     keyframe_depth: metric3d-small
   post:
     depth_align_model: null

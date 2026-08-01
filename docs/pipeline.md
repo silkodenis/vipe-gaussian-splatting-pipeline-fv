@@ -41,6 +41,15 @@ SLAM keyframes, dense depth post-processing is disabled, and the SLAM map is
 saved. Frame acceptance remains controlled by ViPE's DROID motion filter; the
 instance-segmentation cadence is unrelated to SLAM keyframe selection.
 
+The wrapper probes the exact input frame count and sets the SLAM graph buffer
+to `2N + 16` slots. ViPE can retain at most `N` accepted frames in pass 1 and
+appends `N` frames in pass 2. For this dataset that means 56 smoke slots and
+268 full-run slots instead of the upstream 1024-slot allocation. At ViPE's
+internal 384×512 resolution, the upstream buffer reserves several GiB for RGB,
+feature maps, GRU state, disparity, and masks even when those slots are unused.
+The low-memory profiles also reduce `infill_chunk_size` from 16 to 4 to bound
+temporary allocations during pass 2.
+
 Before inference, the wrapper runs Hydra with `--cfg job` and writes the
 resolved configuration to `composed-config.yaml` in the output directory.
 This validates the complete override path without loading models or using GPU
