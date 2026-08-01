@@ -14,6 +14,7 @@ fi
 
 require_conda
 dataset_name="${DATASET_NAME:-zavod70}"
+vipe_profile="${VIPE_PROFILE:-low-vram}"
 vipe_dir="${PROJECT_ROOT}/.cache/vipe"
 
 if [[ ! -f "${vipe_dir}/run.py" ]]; then
@@ -41,11 +42,44 @@ vipe_args=(
   streams.frame_start=0
   streams.frame_end=1000
   streams.frame_skip=1
-  pipeline.init.instance.kf_gap_sec=1.0
   "pipeline.output.path=${output}"
   pipeline.output.save_artifacts=true
   pipeline.output.save_slam_map=true
 )
+
+case "${vipe_profile}" in
+  low-vram)
+    # The target RTX 4050 exposes only 5.64 GiB. Avoid keeping SAM, AOT,
+    # GroundingDINO and a second depth network resident alongside SLAM.
+    vipe_args+=(
+      pipeline.init.instance=null
+      pipeline.init.async_prefetch=false
+      pipeline.init.prefetch_queue_size=1
+      pipeline.slam.keyframe_depth=metric3d-small
+      pipeline.post.depth_align_model=null
+      pipeline.output.save_viz=false
+    )
+    ;;
+  pose-only)
+    # Emergency minimum-memory fallback. Its reconstruction has an arbitrary
+    # global scale, which is acceptable for COLMAP/Splatfacto.
+    vipe_args+=(
+      pipeline.init.instance=null
+      pipeline.init.async_prefetch=false
+      pipeline.init.prefetch_queue_size=1
+      pipeline.slam.keyframe_depth=null
+      pipeline.post.depth_align_model=null
+      pipeline.output.save_viz=false
+    )
+    ;;
+  quality)
+    vipe_args+=(pipeline.init.instance.kf_gap_sec=1.0)
+    ;;
+  *)
+    echo "Unknown VIPE_PROFILE '${vipe_profile}'. Use low-vram, pose-only, or quality." >&2
+    exit 2
+    ;;
+esac
 
 pushd "${vipe_dir}" >/dev/null
 config_path="${output}/composed-config.yaml"
@@ -54,6 +88,7 @@ conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py \
   "${vipe_args[@]}" --cfg job >"${config_tmp}"
 mv "${config_tmp}" "${config_path}"
 echo "ViPE Hydra preflight: OK"
+echo "ViPE profile: ${vipe_profile}"
 conda_cuda_run "${VIPE_ENV_NAME}" uv run python run.py "${vipe_args[@]}"
 popd >/dev/null
 

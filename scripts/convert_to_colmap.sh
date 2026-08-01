@@ -28,10 +28,10 @@ if [[ ! -d "${input}" ]]; then
 fi
 
 pushd "${vipe_dir}" >/dev/null
-conda_cuda_run "${VIPE_ENV_NAME}" uv run python scripts/vipe_to_colmap.py \
+conda_cuda_run "${VIPE_ENV_NAME}" uv run python "${PROJECT_ROOT}/scripts/convert_slam_map_to_colmap.py" \
   "${input}" \
+  --vipe-root "${vipe_dir}" \
   --sequence "${sequence_name}" \
-  --use_slam_map \
   --output "${output_base}"
 popd >/dev/null
 

@@ -47,17 +47,35 @@ rerun `make setup-vipe`. The existing pinned checkout is reused.
 ## ViPE runs out of GPU memory
 
 1. Confirm that no other process is using the GPU with `nvidia-smi`.
-2. Keep the `no_vda` pipeline.
-3. Re-run dataset preparation with a smaller even width, for example 960.
-4. Validate on the 20-frame smoke video before retrying the full sequence.
+2. Confirm the resolved config reports the default low-memory settings:
+
+   ```bash
+   grep -En "instance: null|keyframe_depth: metric3d-small|depth_align_model: null" \
+     artifacts/vipe/smoke/composed-config.yaml
+   ```
+
+3. Retry the smoke run with `make vipe-smoke`. The default `low-vram` profile
+   avoids the model-loading OOM caused by keeping SAM, AOT, GroundingDINO and
+   `UniDepth-L` resident together.
+4. If loading `metric3d-small` still fails, run
+   `VIPE_PROFILE=pose-only make vipe-smoke`. This removes metric scale recovery;
+   relative geometry remains usable by COLMAP and Splatfacto.
+5. Reduce `PREPARED_WIDTH` only if OOM occurs during frame processing. It does
+   not solve an OOM raised by `self.model.cuda()` while weights are loading.
+
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is not the fix for the
+observed log: only 17 MiB was free and the allocation failed while loading
+model weights, so the problem was total resident model size, not meaningful
+allocator fragmentation.
 
 ## Hydra rejects `pipeline.init.kf_gap_sec`
 
 ViPE v1.2.0 nests this setting under the instance configuration. Pull commit
 `fix: validate ViPE Hydra overrides before inference` and rerun
 `make vipe-smoke`; the supported override is
-`pipeline.init.instance.kf_gap_sec=1.0`. The wrapper now performs a composition
-preflight before loading any model.
+`pipeline.init.instance.kf_gap_sec=1.0`. It is used only by the `quality`
+profile because `low-vram` disables instance segmentation entirely. The
+wrapper performs a composition preflight before loading any model.
 
 ## Camera tracking is fragmented
 
@@ -76,7 +94,10 @@ pipeline.output.save_slam_map=true
 ```
 
 Also verify the sequence name inside the ViPE output: `zavod70-smoke` for the
-smoke video and `zavod70` for the full video.
+smoke video and `zavod70` for the full video. The low-VRAM profile intentionally
+does not create `depth/*.zip`; `scripts/convert_slam_map_to_colmap.py` checks
+the RGB, poses, intrinsics, and SLAM map that this conversion path actually
+uses.
 
 ## Nerfstudio cannot find images
 

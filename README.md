@@ -3,16 +3,17 @@
 Reproducible reconstruction of the `zavod70` DJI image sequence with NVIDIA
 ViPE and Gaussian Splatting.
 
-The pipeline estimates camera intrinsics, camera poses, and depth with ViPE,
-exports the reconstruction to COLMAP text format, trains a Nerfstudio
-Splatfacto model, and renders a short camera-path video.
+The pipeline estimates camera intrinsics and poses with ViPE, recovers scale
+with a compact metric-depth prior, exports the ViPE SLAM map to COLMAP text
+format, trains a Nerfstudio Splatfacto model, and renders a short camera-path
+video.
 
 ## Pipeline
 
 ```text
 DJI JPEG archive
   -> validated 1 FPS MP4
-  -> ViPE camera poses and depth
+  -> ViPE camera poses and SLAM map
   -> COLMAP cameras, images, and point cloud
   -> Nerfstudio Splatfacto
   -> rendered demo video
@@ -44,8 +45,9 @@ Pinned versions live in [`configs/versions.env`](configs/versions.env).
 - `sudo` access for the one-time bootstrap
 - At least 20 GB of free disk space for environments and generated artifacts
 
-The verified target laptop has an RTX 4050 Laptop GPU with 6141 MiB VRAM, so
-the initial pipeline uses 1280 px frames and ViPE's `no_vda` configuration.
+The verified target laptop has an RTX 4050 Laptop GPU with 6141 MiB nominal
+VRAM (5.64 GiB visible to PyTorch), so the project defaults to the reproducible
+`low-vram` profile described below.
 
 ## Fresh Ubuntu checkout
 
@@ -226,11 +228,37 @@ make splat-smoke
 `make vipe-smoke` first performs a Hydra composition-only preflight and saves
 the exact resolved job configuration as
 `artifacts/vipe/smoke/composed-config.yaml`. Models and CUDA processing start
-only if every override is valid. The one-second capture cadence is represented
-by `pipeline.init.instance.kf_gap_sec=1.0`.
+only if every override is valid.
 
-Inspect camera poses, depth, the COLMAP point cloud, and GPU memory before
-starting the full run.
+The default `VIPE_PROFILE=low-vram` is designed for the verified RTX 4050. It
+disables SAM/AOT/GroundingDINO instance masks and async prefetch, uses ViPE's
+smaller `metric3d-small` keyframe prior to recover scale, skips dense depth
+post-processing, and saves the 3D-consistent SLAM map used by the next stage.
+This is intentional: ViPE's `no_vda` preset still loads `UniDepth-L`, which
+runs out of memory while loading on this GPU before the first frame.
+
+`make colmap-smoke` uses the pinned ViPE conversion functions but does not
+require a dense-depth ZIP when converting from the SLAM map. This corrects an
+upstream v1.2.0 precondition that checks for that unused file.
+
+For a GPU with substantially more memory, opt into the original masks and
+dense-depth path explicitly:
+
+```bash
+VIPE_PROFILE=quality make vipe-smoke
+```
+
+If `metric3d-small` itself cannot fit after confirming that the GPU is idle,
+use the minimum-memory fallback (the resulting reconstruction has arbitrary
+global scale, which is acceptable to Splatfacto):
+
+```bash
+VIPE_PROFILE=pose-only make vipe-smoke
+```
+
+Inspect camera poses, the COLMAP point cloud, and GPU memory before starting
+the full run. Use the same selected profile for smoke and full runs; the
+default requires no environment override.
 
 ### 5. Run the full pipeline
 

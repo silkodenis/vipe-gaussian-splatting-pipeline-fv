@@ -5,14 +5,21 @@ dataset:
 
 pipeline:
   name: no_vda
+  profile: low-vram
   init:
-    instance:
-      kf_gap_sec: 1.0
+    instance: null
+    async_prefetch: false
+    prefetch_queue_size: 1
+  slam:
+    keyframe_depth: metric3d-small
+  post:
+    depth_align_model: null
   frame_start: 0
   frame_end: 1000
   frame_skip: 1
   save_artifacts: true
   save_slam_map: true
+  save_viz: false
 
 output:
   smoke: artifacts/vipe/smoke

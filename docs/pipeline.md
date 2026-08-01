@@ -34,9 +34,12 @@ Prepared video parameters:
 
 ## ViPE stage
 
-ViPE consumes MP4 files. The project uses the `no_vda` pipeline initially to
-reduce GPU memory pressure and sets `pipeline.init.instance.kf_gap_sec=1.0` so
-adjacent one-second captures can become keyframes.
+ViPE consumes MP4 files. The project uses the `no_vda` pipeline plus a
+`low-vram` override profile on the 5.64 GiB target GPU. Instance segmentation
+is disabled, initialization is serialized, `metric3d-small` supplies scale on
+SLAM keyframes, dense depth post-processing is disabled, and the SLAM map is
+saved. Frame acceptance remains controlled by ViPE's DROID motion filter; the
+instance-segmentation cadence is unrelated to SLAM keyframe selection.
 
 Before inference, the wrapper runs Hydra with `--cfg job` and writes the
 resolved configuration to `composed-config.yaml` in the output directory.
@@ -48,17 +51,18 @@ Outputs required by the next stage are:
 - RGB frame artifacts
 - camera intrinsics
 - camera-to-world poses
-- depth artifacts
 - saved SLAM map
 
 The full run should only start after the smoke trajectory is coherent and the
-depth visualization contains recognizable scene geometry.
+SLAM-map point cloud contains recognizable scene geometry.
 
 ## COLMAP stage
 
-ViPE's `vipe_to_colmap.py` creates `cameras.txt`, `images.txt`,
-`points3D.txt`, and an `images/` directory. We use `--use_slam_map` because the
-ViPE run explicitly saves that representation.
+The project adapter creates `cameras.txt`, `images.txt`, `points3D.txt`, and an
+`images/` directory by reusing the pinned ViPE v1.2.0 conversion functions. It
+uses the saved SLAM map and therefore does not require a dense-depth artifact.
+The adapter exists because the upstream converter checks for a depth ZIP even
+on its `--use_slam_map` branch, although that branch never reads the ZIP.
 
 ViPE derives its sequence identifier from the MP4 stem. The wrappers therefore
 use `zavod70-smoke` for smoke artifacts and `zavod70` for the full run.
