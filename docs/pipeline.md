@@ -36,6 +36,12 @@ index. `prepare_dataset.py` requires one contiguous sequence and deliberately
 rejects unexpected files. It writes normalized filenames without modifying
 the JPEG payload, so EXIF/XMP remains available for diagnostics.
 
+The default Make targets additionally enforce the authorized archive's exact
+SHA-256, frame count, first/last indices, and total uncompressed byte count.
+Both inspection and extraction fail on an identity mismatch. Alternative data
+therefore requires an explicit, documented update of all `EXPECTED_*` values
+in the local `.env`; changing only the filename is insufficient.
+
 Prepared video parameters:
 
 - 1 FPS, matching the source capture interval

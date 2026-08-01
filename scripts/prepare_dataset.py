@@ -28,12 +28,34 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--fps", type=float, default=1.0)
     parser.add_argument("--smoke-frames", type=int, default=20)
+    parser.add_argument("--expected-sha256")
+    parser.add_argument("--expected-frame-count", type=int)
+    parser.add_argument("--expected-first-frame", type=int)
+    parser.add_argument("--expected-last-frame", type=int)
+    parser.add_argument("--expected-uncompressed-bytes", type=int)
     parser.add_argument(
         "--inspect-only",
         action="store_true",
         help="Validate and summarize the archive without extracting it",
     )
     return parser.parse_args()
+
+
+def validate_expected_dataset(summary: dict[str, object], args: argparse.Namespace) -> None:
+    expected = {
+        "archive_sha256": args.expected_sha256,
+        "frame_count": args.expected_frame_count,
+        "first_frame_index": args.expected_first_frame,
+        "last_frame_index": args.expected_last_frame,
+        "uncompressed_bytes": args.expected_uncompressed_bytes,
+    }
+    mismatches = [
+        f"{key}: got {summary[key]!r}, expected {value!r}"
+        for key, value in expected.items()
+        if value is not None and summary[key] != value
+    ]
+    if mismatches:
+        raise ValueError("Dataset identity mismatch; " + "; ".join(mismatches))
 
 
 def sha256(path: Path) -> str:
@@ -173,6 +195,7 @@ def main() -> int:
         }
 
         print(json.dumps(summary, indent=2))
+        validate_expected_dataset(summary, args)
         if args.inspect_only:
             return 0
 

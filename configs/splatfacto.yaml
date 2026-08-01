@@ -1,6 +1,7 @@
 dataset:
   name: zavod70
-  colmap_path: artifacts/colmap/zavod70
+  smoke_colmap_path: artifacts/colmap/smoke/zavod70-smoke
+  full_colmap_path: artifacts/colmap/full/zavod70
   images_path: .
   reconstruction_path: .
 
@@ -10,6 +11,11 @@ training:
   smoke_iterations: 3000
   output_dir: artifacts/splatfacto
   experiment_name: zavod70
+  full_low_vram:
+    cache_images: cpu
+    stop_split_at: 6000
+    viewer_rays_per_chunk: 8192
+    pytorch_cuda_alloc_conf: max_split_size_mb:128
 
 render:
   camera_path: configs/camera_path.json

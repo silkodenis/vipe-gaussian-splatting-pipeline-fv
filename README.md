@@ -51,7 +51,8 @@ VRAM (5.64 GiB visible to PyTorch), so the project defaults to the reproducible
 
 ## Fresh Ubuntu checkout
 
-These are the only commands required before dataset preparation:
+The repository is private, so the machine must have a GitHub SSH key authorized
+for it. These are the only commands required before dataset preparation:
 
 ```bash
 git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
@@ -177,9 +178,10 @@ Expected source identity:
 | Files | 126 contiguous JPEG frames, indices 1 through 126 |
 | Uncompressed bytes | 1,074,302,976 |
 
-Do not continue if the checksum or frame range differs. To use another archive,
-copy `.env.example` to `.env` and set `DATASET_ARCHIVE`; document its checksum
-and provenance in the final report.
+Do not continue if the checksum or frame range differs. To intentionally use
+another authorized archive, copy `.env.example` to `.env` and update
+`DATASET_ARCHIVE` together with all five `EXPECTED_*` identity fields; document
+its checksum and provenance in the final report.
 
 The verified preparation result on Ubuntu is:
 
@@ -189,7 +191,9 @@ The verified preparation result on Ubuntu is:
 | `data/interim/zavod70.mp4` | 1280×960 | 1 | 126 |
 
 The source ZIP, extracted JPEGs, manifest, and MP4 files remain local and are
-covered by `.gitignore`.
+covered by `.gitignore`. Both `make inspect` and `make prepare` enforce the
+checksum, frame count and range, and uncompressed byte count shown above; a
+different archive fails before any GPU stage starts.
 
 ## Quick start on Ubuntu
 
@@ -232,8 +236,8 @@ a 6 GiB card.
 ### 3. Install pinned GPU environments
 
 ```bash
-make setup-vipe
-make setup-splatfacto
+make setup
+make diagnose
 ```
 
 The upstream ViPE checkout is stored under `.cache/vipe` and verified against
@@ -256,9 +260,11 @@ exposes Conda CUDA's `libcuda.so` stub; runtime continues to use the real NVIDIA
 driver. A commit-specific marker avoids rebuilding an already verified local
 extension. No package needs to be installed manually.
 
-Verify both environments after installation with:
+The combined targets above run these explicit component commands in order:
 
 ```bash
+make setup-vipe
+make setup-splatfacto
 make diagnose-vipe
 make diagnose-splatfacto
 ```
@@ -266,11 +272,14 @@ make diagnose-splatfacto
 ### 4. Run the smoke pipeline
 
 ```bash
-make vipe-smoke
-make colmap-smoke
-make splat-smoke
+make pipeline-smoke
 make validate-splat-smoke
 ```
+
+`make pipeline-smoke` sequentially runs `make vipe-smoke`,
+`make colmap-smoke`, and `make splat-smoke`; it stops immediately if any stage
+fails. The final training wrapper already validates its checkpoint, while the
+explicit validation command is retained as a clean-room acceptance check.
 
 `make vipe-smoke` first performs a Hydra composition-only preflight and saves
 the exact resolved job configuration as
@@ -326,11 +335,13 @@ default requires no environment override.
 ### 5. Run the full pipeline
 
 ```bash
-make vipe-full
-make colmap-full
-make splat-full
+make pipeline-full
 make validate-splat-full
 ```
+
+`make pipeline-full` sequentially runs `make vipe-full`, `make colmap-full`,
+and `make splat-full`. On a clean checkout this is a new run; use the resume
+target only after an interrupted run has produced a checkpoint.
 
 The full preset is deliberately sized for the verified 6 GiB RTX 4050. It
 keeps source images in CPU memory, stops adding/splitting Gaussians at step
@@ -366,6 +377,43 @@ export it as `configs/camera_path.json`. Then run:
 ```
 
 The result is written to `renders/zavod70-demo.mp4`.
+
+## Clean-room acceptance sequence
+
+Run this from a new directory on Ubuntu to test the repository exactly as a
+reviewer would. The dataset ZIP is the only file supplied outside Git:
+
+```bash
+git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
+cd vipe-gaussian-splatting-pipeline-fv
+
+./scripts/bootstrap_ubuntu.sh
+make check
+
+# Copy zavod70-20260801T082255Z-1-001.zip into this directory first.
+make inspect
+make prepare
+
+make setup
+make diagnose
+make pipeline-smoke
+make validate-splat-smoke
+make pipeline-full
+make validate-splat-full
+make view-splat-full
+```
+
+For SSH access to the viewer, establish the tunnel from the client machine
+before `make view-splat-full`:
+
+```bash
+ssh -L 7007:localhost:7007 user@ubuntu-host
+```
+
+Do not copy `.cache`, `data`, or `artifacts` from an earlier checkout during
+this test. Their absence is what proves that dependency installation, dataset
+preparation, and all pipeline stages are reproducible from the documented
+inputs.
 
 ## Repository layout
 
