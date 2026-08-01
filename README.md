@@ -400,7 +400,7 @@ manual camera selection is not required. The Viewer also starts with this crop:
 ```text
 background RGB: 128, 128, 128
 center:         0, 0, 0
-scale:          1, 1, 1
+scale:          2.5, 1.94, 1
 rotation:       0, 0, 0
 ```
 

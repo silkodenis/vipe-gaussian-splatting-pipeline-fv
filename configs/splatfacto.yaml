@@ -27,6 +27,6 @@ render:
     resolution: [1280, 960]
     crop:
       center: [0.0, 0.0, 0.0]
-      scale: [1.0, 1.0, 1.0]
+      scale: [2.5, 1.94, 1.0]
       rotation: [0.0, 0.0, 0.0]
       background_rgb: [128, 128, 128]
