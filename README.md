@@ -23,12 +23,16 @@ Tested end-to-end on a local server running **Ubuntu 26.04** with an
 
 ## Quick Start
 
+### 1. Clone the Repository
+
 On the remote machine:
 
 ```bash
 git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
 cd vipe-gaussian-splatting-pipeline-fv
 ```
+
+### 2. Upload the Dataset
 
 On the local machine containing the dataset:
 
