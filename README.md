@@ -9,7 +9,7 @@ This project transforms an ordered sequence of aerial images into an interactive
 NVIDIA ViPE, while Nerfstudio Splatfacto is used for reconstruction,
 visualization, and video rendering.
 
-## Technology Stack
+## Built With
 
 - **NVIDIA ViPE** — camera pose and intrinsic estimation
 - **COLMAP format** — camera, image, and point-cloud interchange
