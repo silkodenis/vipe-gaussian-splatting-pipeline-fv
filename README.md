@@ -47,7 +47,7 @@ Validated reconstruction and rendering artifacts
 
 Run `make` or `make help` to list all available pipeline commands:
 
-<details>
+<details open>
 <summary><strong>Available commands</strong></summary>
 
 ```text
