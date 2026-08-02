@@ -20,3 +20,29 @@ visualization, and video rendering.
 
 Tested end-to-end on a local server running **Ubuntu 26.04** with an
 **NVIDIA GeForce RTX 4050 Laptop GPU and 6 GB of VRAM**.
+
+## Quick Start
+
+On the remote machine:
+
+```bash
+git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
+cd vipe-gaussian-splatting-pipeline-fv
+```
+
+On the local machine containing the dataset:
+
+```bash
+LOCAL_ZIP="/path/to/zavod70-20260801T082255Z-1-001.zip"
+REMOTE_USER="<user>"
+REMOTE_HOST="<host-or-ip>"
+REMOTE_REPO="/absolute/path/to/vipe-gaussian-splatting-pipeline-fv"
+
+scp "${LOCAL_ZIP}" \
+  "${REMOTE_USER}@${REMOTE_HOST}:/tmp/zavod70-dataset.zip"
+
+ssh "${REMOTE_USER}@${REMOTE_HOST}" \
+  "mkdir -p '${REMOTE_REPO}/data/input/zavod70' && \
+   unzip -j -n /tmp/zavod70-dataset.zip '*.jpg' \
+     -d '${REMOTE_REPO}/data/input/zavod70'"
+```
