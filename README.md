@@ -160,6 +160,9 @@ The final video is stored under:
 
 ## Configuration
 
+<details>
+<summary><strong>Local overrides: <code>.env</code></strong></summary>
+
 The default settings reproduce the verified `zavod70` result on the reference
 RTX 4050 machine; no local configuration file is required.
 
@@ -172,3 +175,36 @@ cp .env.example .env
 Edit `.env` for the local environment. The file is ignored by Git. Custom
 datasets must use contiguous filenames ending in `_0001_v.jpg`, `_0002_v.jpg`,
 and so on.
+
+</details>
+
+<details>
+<summary><strong><code>configs/vipe.yaml</code></strong></summary>
+
+Documents the verified ViPE dataset paths, low-VRAM pipeline profile, SLAM
+settings, frame range, and output directories. It is a readable reference for
+the current pipeline; runtime profile selection is controlled by `VIPE_PROFILE`
+in `.env` and applied by `scripts/run_vipe.sh`.
+
+</details>
+
+<details>
+<summary><strong><code>configs/splatfacto.yaml</code></strong></summary>
+
+Records the verified Splatfacto dataset and training layout as a reference. Its
+`render.dataset_path` section is consumed by `make view-splat-full` and defines
+keyframe stride, transition duration, FPS, render resolution, Viewer
+resolution, crop, and background color. Training memory overrides are
+configured through `.env`.
+
+</details>
+
+<details>
+<summary><strong><code>configs/versions.env</code></strong></summary>
+
+Pins the ViPE source revision, Nerfstudio and PyTorch versions, CUDA build
+target, tiny-cuda-nn revision, build concurrency, and Miniforge installer
+checksum. Setup scripts load this file directly. Change it only when
+intentionally upgrading and revalidating the dependency stack.
+
+</details>
