@@ -158,25 +158,7 @@ The final video is stored under:
 
 </details>
 
-## Configuration
-
-<details>
-<summary><strong>Local overrides: <code>.env</code></strong></summary>
-
-The default settings reproduce the verified `zavod70` result on the reference
-RTX 4050 machine; no local configuration file is required.
-
-To customize the dataset, preprocessing, ViPE profile, or GPU memory settings:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` for the local environment. The file is ignored by Git. Custom
-datasets must use contiguous filenames ending in `_0001_v.jpg`, `_0002_v.jpg`,
-and so on.
-
-</details>
+## Pipeline Configuration
 
 <details>
 <summary><strong><code>configs/vipe.yaml</code></strong></summary>
@@ -206,5 +188,23 @@ Pins the ViPE source revision, Nerfstudio and PyTorch versions, CUDA build
 target, tiny-cuda-nn revision, build concurrency, and Miniforge installer
 checksum. Setup scripts load this file directly. Change it only when
 intentionally upgrading and revalidating the dependency stack.
+
+</details>
+
+<details>
+<summary><strong>Local overrides: <code>.env</code></strong></summary>
+
+The default settings reproduce the verified `zavod70` result on the reference
+RTX 4050 machine; no local configuration file is required.
+
+To customize the dataset, preprocessing, ViPE profile, or GPU memory settings:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` for the local environment. The file is ignored by Git. Custom
+datasets must use contiguous filenames ending in `_0001_v.jpg`, `_0002_v.jpg`,
+and so on.
 
 </details>
