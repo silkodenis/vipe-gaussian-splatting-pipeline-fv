@@ -39,6 +39,18 @@ pipeline has been validated.
 
 Pinned versions live in [`configs/versions.env`](configs/versions.env).
 
+## Command reference
+
+Run `make` or `make help` at any time to print every supported project command,
+grouped by pipeline stage, with a short description:
+
+```bash
+make help
+```
+
+The generated list is maintained directly alongside the Makefile targets, so
+it stays synchronized as commands are added or changed.
+
 ## Host requirements
 
 - Ubuntu Linux with an NVIDIA GPU and a driver compatible with CUDA 12.8
