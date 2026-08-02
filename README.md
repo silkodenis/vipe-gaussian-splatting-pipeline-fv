@@ -2,7 +2,7 @@
 
 ![3D scene reconstruction with camera path](readme_assets/results/3d_scene_with_camera_path.jpeg)
 
-[▶ Watch the 3D reconstruction video on YouTube](https://youtu.be/_hh4plcQX_4)
+[▶ Watch the 3D reconstruction video on YouTube](https://youtu.be/ZgxRQRAwB9g?si=3wm0OdSNvdt5z208)
 
 This project transforms an ordered sequence of aerial images into an interactive
 3D Gaussian Splatting scene. Camera parameters and trajectory are recovered with
