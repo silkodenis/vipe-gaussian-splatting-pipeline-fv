@@ -157,10 +157,8 @@ make inspect  # Validate the source images and dataset identity
 make prepare  # Create the smoke and full ViPE input videos
 ```
 
-The commands validate all 126 source images and create:
-
-- `data/interim/zavod70-smoke.mp4`
-- `data/interim/zavod70.mp4`
+The commands validate the source image sequence and create the smoke and full
+ViPE input videos under `data/interim/`.
 
 </details>
 
