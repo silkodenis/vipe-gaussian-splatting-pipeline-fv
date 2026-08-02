@@ -103,8 +103,8 @@ Viewer and rendering
 On the remote machine:
 
 ```bash
-git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
-cd vipe-gaussian-splatting-pipeline-fv
+git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline.git
+cd vipe-gaussian-splatting-pipeline
 ```
 
 </details>
@@ -134,7 +134,7 @@ On the local machine containing the dataset:
 LOCAL_ZIP="/path/to/dataset.zip"
 REMOTE_USER="<user>"
 REMOTE_HOST="<host-or-ip>"
-REMOTE_REPO="/absolute/path/to/vipe-gaussian-splatting-pipeline-fv"
+REMOTE_REPO="/absolute/path/to/vipe-gaussian-splatting-pipeline"
 DATASET_NAME="<dataset-name>"
 
 scp "${LOCAL_ZIP}" \
