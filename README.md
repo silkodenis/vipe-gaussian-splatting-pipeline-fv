@@ -23,7 +23,8 @@ Tested end-to-end on a local server running **Ubuntu 26.04** with an
 
 ## Steps to Reproduce
 
-### 1. Clone the Repository
+<details>
+<summary><strong>1. Clone the Repository</strong></summary>
 
 On the remote machine:
 
@@ -32,7 +33,10 @@ git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
 cd vipe-gaussian-splatting-pipeline-fv
 ```
 
-### 2. Set Up the Environment
+</details>
+
+<details>
+<summary><strong>2. Set Up the Environment</strong></summary>
 
 On the remote machine, from the repository root:
 
@@ -43,7 +47,10 @@ make setup      # Install the pinned ViPE and Splatfacto environments
 make diagnose   # Validate both GPU environments
 ```
 
-### 3. Upload the Dataset
+</details>
+
+<details>
+<summary><strong>3. Upload the Dataset</strong></summary>
 
 On the local machine containing the dataset:
 
@@ -64,7 +71,10 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" \
      -d '${REMOTE_REPO}/data/input/zavod70'"
 ```
 
-### 4. Inspect and Prepare the Dataset
+</details>
+
+<details>
+<summary><strong>4. Inspect and Prepare the Dataset</strong></summary>
 
 On the remote machine, from the repository root:
 
@@ -78,7 +88,10 @@ The commands validate all 126 source images and create:
 - `data/interim/zavod70-smoke.mp4`
 - `data/interim/zavod70.mp4`
 
-### 5. Run the Full Reconstruction Pipeline
+</details>
+
+<details>
+<summary><strong>5. Run the Full Reconstruction Pipeline</strong></summary>
 
 On the remote machine, from the repository root:
 
@@ -98,3 +111,49 @@ The generated artifacts are stored under:
 - `artifacts/vipe/full/`
 - `artifacts/colmap/full/zavod70/`
 - `artifacts/splatfacto/zavod70/splatfacto/<run-timestamp>/`
+
+</details>
+
+<details>
+<summary><strong>6. Review and Generate the Camera Path</strong></summary>
+
+On the local machine, connect to the remote machine with Viewer port forwarding:
+
+```bash
+ssh -L 7007:localhost:7007 <user>@<host-or-ip>
+```
+
+In the remote SSH session, from the repository root:
+
+```bash
+make view-splat-full  # Open the trained model with the recovered camera path
+```
+
+Open [http://localhost:7007](http://localhost:7007), then:
+
+1. Open the `RENDER` tab and review the preloaded camera path.
+2. Adjust the keyframes or render settings if needed.
+3. Click `Generate Command` to save the final camera-path JSON.
+4. Do not copy or run the displayed `ns-render` command.
+5. Stop the Viewer with `Ctrl+C`.
+
+The generated camera path is stored under:
+
+- `artifacts/colmap/full/zavod70/camera_paths/<timestamp>.json`
+
+</details>
+
+<details>
+<summary><strong>7. Render the Video</strong></summary>
+
+On the remote machine, from the repository root:
+
+```bash
+make render-splat-full  # Render the newest generated camera path
+```
+
+The final video is stored under:
+
+- `renders/zavod70/<timestamp>.mp4`
+
+</details>
