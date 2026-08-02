@@ -43,6 +43,58 @@ Validated reconstruction and rendering artifacts
 - **Configuration files** pin dependencies and define runtime and rendering
   settings.
 
+## Makefile Interface
+
+Run `make` or `make help` to list all available pipeline commands:
+
+<details>
+<summary><strong>Available commands</strong></summary>
+
+```text
+Usage: make <command>
+  help                     Show all available commands
+
+Environment
+  bootstrap                Install system packages and project-local Conda
+  check                    Check host, GPU, tools, disk, and Conda prerequisites
+  diagnose                 Diagnose both ViPE and Splatfacto environments
+  setup                    Install both pinned ViPE and Splatfacto environments
+  setup-vipe               Install the pinned ViPE environment
+  diagnose-vipe            Validate the ViPE environment and CUDA runtime
+  setup-splatfacto         Install the pinned Nerfstudio/Splatfacto environment
+  diagnose-splatfacto      Validate the Nerfstudio/Splatfacto environment
+
+Dataset
+  inspect                  Validate and summarize input images without preparing videos
+  prepare                  Validate images and prepare full and smoke MP4 inputs
+
+Complete pipelines
+  pipeline-smoke           Run ViPE, COLMAP export, and Splatfacto smoke stages
+  pipeline-full            Run ViPE, COLMAP export, and Splatfacto full stages
+
+ViPE and COLMAP
+  vipe-smoke               Run ViPE on the smoke video
+  vipe-full                Run ViPE on the complete video
+  colmap-smoke             Export the smoke ViPE result to COLMAP format
+  colmap-full              Export the complete ViPE result to COLMAP format
+
+Splatfacto
+  splat-smoke              Train the smoke Splatfacto model
+  splat-full               Train the complete Splatfacto model
+  resume-splat-smoke       Resume smoke training from its latest checkpoint
+  resume-splat-full        Resume full training from its latest checkpoint
+  validate-splat-smoke     Validate the completed smoke model and checkpoint
+  validate-splat-full      Validate the completed full model and checkpoint
+
+Viewer and rendering
+  view-splat-smoke         Open the smoke model in the Nerfstudio Viewer
+  view-splat-full          Open the full model with ordered camera keyframes
+  render-splat-smoke       Render the newest smoke Viewer camera path
+  render-splat-full        Render the newest full Viewer camera path
+```
+
+</details>
+
 ## Steps to Reproduce
 
 <details>
