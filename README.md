@@ -52,3 +52,14 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" \
    unzip -j -n /tmp/zavod70-dataset.zip '*.jpg' \
      -d '${REMOTE_REPO}/data/input/zavod70'"
 ```
+
+### 3. Set Up the Environment
+
+On the remote machine, from the repository root:
+
+```bash
+make bootstrap  # Install system dependencies and project-local Conda
+make check      # Validate the host system and NVIDIA GPU
+make setup      # Install the pinned ViPE and Splatfacto environments
+make diagnose   # Validate both GPU environments
+```
