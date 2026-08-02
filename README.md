@@ -131,18 +131,19 @@ On the local machine containing the dataset:
 *Update the paths and remote connection details below for your environment.*
 
 ```bash
-LOCAL_ZIP="/path/to/zavod70-20260801T082255Z-1-001.zip"
+LOCAL_ZIP="/path/to/dataset.zip"
 REMOTE_USER="<user>"
 REMOTE_HOST="<host-or-ip>"
 REMOTE_REPO="/absolute/path/to/vipe-gaussian-splatting-pipeline-fv"
+DATASET_NAME="<dataset-name>"
 
 scp "${LOCAL_ZIP}" \
-  "${REMOTE_USER}@${REMOTE_HOST}:/tmp/zavod70-dataset.zip"
+  "${REMOTE_USER}@${REMOTE_HOST}:/tmp/vipe-dataset.zip"
 
 ssh "${REMOTE_USER}@${REMOTE_HOST}" \
-  "mkdir -p '${REMOTE_REPO}/data/input/zavod70' && \
-   unzip -j -n /tmp/zavod70-dataset.zip '*.jpg' \
-     -d '${REMOTE_REPO}/data/input/zavod70'"
+  "mkdir -p '${REMOTE_REPO}/data/input/${DATASET_NAME}' && \
+   unzip -j -n /tmp/vipe-dataset.zip '*.jpg' \
+     -d '${REMOTE_REPO}/data/input/${DATASET_NAME}'"
 ```
 
 </details>
@@ -181,8 +182,8 @@ The commands produce and validate:
 The generated artifacts are stored under:
 
 - `artifacts/vipe/full/`
-- `artifacts/colmap/full/zavod70/`
-- `artifacts/splatfacto/zavod70/splatfacto/<run-timestamp>/`
+- `artifacts/colmap/full/<dataset-name>/`
+- `artifacts/splatfacto/<dataset-name>/splatfacto/<run-timestamp>/`
 
 </details>
 
@@ -211,7 +212,7 @@ Open [http://localhost:7007](http://localhost:7007), then:
 
 The generated camera path is stored under:
 
-- `artifacts/colmap/full/zavod70/camera_paths/<timestamp>.json`
+- `artifacts/colmap/full/<dataset-name>/camera_paths/<timestamp>.json`
 
 </details>
 
@@ -226,7 +227,7 @@ make render-splat-full  # Render the newest generated camera path
 
 The final video is stored under:
 
-- `renders/zavod70/<timestamp>.mp4`
+- `renders/<dataset-name>/<timestamp>.mp4`
 
 </details>
 
@@ -266,8 +267,8 @@ intentionally upgrading and revalidating the dependency stack.
 <details>
 <summary><strong>Local overrides: <code>.env</code></strong></summary>
 
-The default settings reproduce the verified `zavod70` result on the reference
-RTX 4050 machine; no local configuration file is required.
+The default settings reproduce the verified reference result on the RTX 4050
+machine; no local configuration file is required.
 
 To customize the dataset, preprocessing, ViPE profile, or GPU memory settings:
 
