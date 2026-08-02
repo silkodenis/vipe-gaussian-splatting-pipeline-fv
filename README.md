@@ -21,7 +21,7 @@ visualization, and video rendering.
 Tested end-to-end on a local server running **Ubuntu 26.04** with an
 **NVIDIA GeForce RTX 4050 Laptop GPU and 6 GB of VRAM**.
 
-## Quick Start
+## Steps to Reproduce
 
 ### 1. Clone the Repository
 
@@ -69,8 +69,8 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" \
 On the remote machine, from the repository root:
 
 ```bash
-make inspect
-make prepare
+make inspect  # Validate the source images and dataset identity
+make prepare  # Create the smoke and full ViPE input videos
 ```
 
 The commands validate all 126 source images and create:
@@ -83,8 +83,8 @@ The commands validate all 126 source images and create:
 On the remote machine, from the repository root:
 
 ```bash
-make pipeline-full
-make validate-splat-full
+make pipeline-full        # Run ViPE, COLMAP conversion, and Splatfacto training
+make validate-splat-full  # Validate the trained model and final checkpoint
 ```
 
 The commands produce and validate:
