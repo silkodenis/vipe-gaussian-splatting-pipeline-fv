@@ -32,7 +32,18 @@ git clone git@github.com:silkodenis/vipe-gaussian-splatting-pipeline-fv.git
 cd vipe-gaussian-splatting-pipeline-fv
 ```
 
-### 2. Upload the Dataset
+### 2. Set Up the Environment
+
+On the remote machine, from the repository root:
+
+```bash
+make bootstrap  # Install system dependencies and project-local Conda
+make check      # Validate the host system and NVIDIA GPU
+make setup      # Install the pinned ViPE and Splatfacto environments
+make diagnose   # Validate both GPU environments
+```
+
+### 3. Upload the Dataset
 
 On the local machine containing the dataset:
 
@@ -53,13 +64,16 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" \
      -d '${REMOTE_REPO}/data/input/zavod70'"
 ```
 
-### 3. Set Up the Environment
+### 4. Inspect and Prepare the Dataset
 
 On the remote machine, from the repository root:
 
 ```bash
-make bootstrap  # Install system dependencies and project-local Conda
-make check      # Validate the host system and NVIDIA GPU
-make setup      # Install the pinned ViPE and Splatfacto environments
-make diagnose   # Validate both GPU environments
+make inspect
+make prepare
 ```
+
+The commands validate all 126 source images and create:
+
+- `data/interim/zavod70-smoke.mp4`
+- `data/interim/zavod70.mp4`
