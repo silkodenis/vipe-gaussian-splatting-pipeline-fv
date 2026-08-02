@@ -77,3 +77,24 @@ The commands validate all 126 source images and create:
 
 - `data/interim/zavod70-smoke.mp4`
 - `data/interim/zavod70.mp4`
+
+### 5. Run the Full Reconstruction Pipeline
+
+On the remote machine, from the repository root:
+
+```bash
+make pipeline-full
+make validate-splat-full
+```
+
+The commands produce and validate:
+
+- ViPE camera poses and SLAM map
+- COLMAP-compatible cameras, images, and point cloud
+- trained Splatfacto model and final checkpoint
+
+The generated artifacts are stored under:
+
+- `artifacts/vipe/full/`
+- `artifacts/colmap/full/zavod70/`
+- `artifacts/splatfacto/zavod70/splatfacto/<run-timestamp>/`
