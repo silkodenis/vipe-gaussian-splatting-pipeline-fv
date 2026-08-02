@@ -21,6 +21,28 @@ visualization, and video rendering.
 Tested end-to-end on a local server running **Ubuntu 26.04** with an
 **NVIDIA GeForce RTX 4050 Laptop GPU and 6 GB of VRAM**.
 
+## Architecture
+
+```text
+Makefile commands
+        ↓
+Bash orchestration and environment management
+        ↓
+Python data processing and API adapters
+        ↓
+ViPE, FFmpeg, COLMAP format, and Nerfstudio
+        ↓
+Validated reconstruction and rendering artifacts
+```
+
+- **Makefile** provides the public command-line interface.
+- **Bash scripts** manage environments, execute pipeline stages, and validate
+  outputs.
+- **Python scripts** process datasets and integrate with the ViPE and
+  Nerfstudio APIs.
+- **Configuration files** pin dependencies and define runtime and rendering
+  settings.
+
 ## Steps to Reproduce
 
 <details>
