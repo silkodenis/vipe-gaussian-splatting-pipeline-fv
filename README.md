@@ -157,3 +157,18 @@ The final video is stored under:
 - `renders/zavod70/<timestamp>.mp4`
 
 </details>
+
+## Configuration
+
+The default settings reproduce the verified `zavod70` result on the reference
+RTX 4050 machine; no local configuration file is required.
+
+To customize the dataset, preprocessing, ViPE profile, or GPU memory settings:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` for the local environment. The file is ignored by Git. Custom
+datasets must use contiguous filenames ending in `_0001_v.jpg`, `_0002_v.jpg`,
+and so on.
