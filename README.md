@@ -32,6 +32,8 @@ cd vipe-gaussian-splatting-pipeline-fv
 
 On the local machine containing the dataset:
 
+*Update the paths and remote connection details below for your environment.*
+
 ```bash
 LOCAL_ZIP="/path/to/zavod70-20260801T082255Z-1-001.zip"
 REMOTE_USER="<user>"
